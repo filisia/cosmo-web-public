@@ -42,6 +42,9 @@ fi
 if git show HEAD:DEPLOYMENT_GUIDE.md >/dev/null 2>&1; then
     git checkout HEAD -- DEPLOYMENT_GUIDE.md
 fi
+if git show HEAD:vercel.json >/dev/null 2>&1; then
+    git checkout HEAD -- vercel.json
+fi
 
 # Check if there are any changes
 if git diff --quiet; then
