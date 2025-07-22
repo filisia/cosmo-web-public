@@ -15,8 +15,10 @@ const getWebSocketUrlFromEnv = () => {
     return window.COSMO_WS_URL;
   }
   
-  // Default fallback
-  return 'ws://localhost:8080';
+  // Default fallback - use secure WebSocket for HTTPS
+  return typeof window !== 'undefined' && window.location.protocol === 'https:' 
+    ? 'wss://localhost:8443' 
+    : 'ws://localhost:8080';
 };
 
 const config = {
