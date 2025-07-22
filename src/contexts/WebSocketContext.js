@@ -110,31 +110,6 @@ export function WebSocketProvider({ children }) {
         });
         break;
 
-      case 'deviceData':
-        console.log('[WebSocketContext] Handling deviceData message:', message);
-        // Update the connected devices list with the new device data
-        setConnectedDevices(prevDevices => {
-          const existingDeviceIndex = prevDevices.findIndex(d => d.id === message.id);
-          if (existingDeviceIndex >= 0) {
-            // Update existing device
-            const updatedDevices = [...prevDevices];
-            updatedDevices[existingDeviceIndex] = { ...updatedDevices[existingDeviceIndex], ...message };
-            return updatedDevices;
-          } else {
-            // Add new device
-            return [...prevDevices, message];
-          }
-        });
-        break;
-
-      case 'deviceDisconnected':
-        console.log('[WebSocketContext] Handling deviceDisconnected message:', message);
-        // Remove the disconnected device from the list
-        setConnectedDevices(prevDevices => {
-          return prevDevices.filter(device => device.id !== message.device?.id);
-        });
-        break;
-
       case 'buttonPress':
         // console.log('[WebSocketContext] 🎯 Button press detected:', message);
         setDeviceValues(prev => ({

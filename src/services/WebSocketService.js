@@ -20,8 +20,6 @@ class WebSocketService {
     this.maxReconnectAttempts = 5;
     this.reconnectDelay = 1000;
     console.log('[WebSocketService] Initialized with URL:', this.url);
-    console.log('[WebSocketService] Current page protocol:', typeof window !== 'undefined' ? window.location.protocol : 'unknown');
-    console.log('[WebSocketService] WebSocket URL protocol:', this.url.startsWith('ws://') ? 'ws://' : this.url.startsWith('wss://') ? 'wss://' : 'unknown');
     
     // Auto-connect on initialization
     setTimeout(() => {
