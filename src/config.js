@@ -1,24 +1,33 @@
 // Try to get WebSocket URL from multiple sources
 const getWebSocketUrlFromEnv = () => {
+  console.log('🔧 getWebSocketUrlFromEnv called');
+  console.log('🔧 process.env.REACT_APP_WS_URL:', process.env.REACT_APP_WS_URL);
+  console.log('🔧 window.COSMO_CONFIG:', typeof window !== 'undefined' ? window.COSMO_CONFIG : 'window undefined');
+  
   // Check for environment variable first
   if (process.env.REACT_APP_WS_URL) {
+    console.log('🔧 Using env var:', process.env.REACT_APP_WS_URL);
     return process.env.REACT_APP_WS_URL;
   }
   
   // Check for runtime configuration (useful for different hosting environments)
   if (typeof window !== 'undefined' && window.COSMO_CONFIG && window.COSMO_CONFIG.wsUrl) {
+    console.log('🔧 Using window.COSMO_CONFIG.wsUrl:', window.COSMO_CONFIG.wsUrl);
     return window.COSMO_CONFIG.wsUrl;
   }
   
   // Legacy support for direct window variable
   if (typeof window !== 'undefined' && window.COSMO_WS_URL) {
+    console.log('🔧 Using window.COSMO_WS_URL:', window.COSMO_WS_URL);
     return window.COSMO_WS_URL;
   }
   
   // Default fallback - use secure WebSocket for HTTPS
-  return typeof window !== 'undefined' && window.location.protocol === 'https:' 
+  const fallbackUrl = typeof window !== 'undefined' && window.location.protocol === 'https:' 
     ? 'wss://localhost:8443' 
     : 'ws://localhost:8080';
+  console.log('🔧 Using fallback URL:', fallbackUrl);
+  return fallbackUrl;
 };
 
 const config = {
