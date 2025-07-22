@@ -212,6 +212,42 @@ chmod +x cosmo-bridge-linux.AppImage
             </ul>
         </div>
 
+        <h3>Mixed Content Issues (HTTPS)</h3>
+        <div class="warning">
+            <strong>If you see "Mixed Content" errors:</strong>
+            <p>This happens because the web app uses HTTPS but tries to connect to a non-secure WebSocket. Here are solutions:</p>
+            
+            <h4>Option 1: Allow Mixed Content (Recommended)</h4>
+            <div class="code">
+# Chrome/Edge:
+1. Click the lock icon 🔒 in the address bar
+2. Click "Site settings"
+3. Find "Insecure content" and change to "Allow"
+4. Refresh the page
+
+# Firefox:
+1. Click the shield icon 🛡️ in the address bar
+2. Click "Site permissions"
+3. Find "Access your location" and change to "Allow"
+4. Refresh the page
+
+# Safari:
+1. Go to Safari > Preferences > Security
+2. Uncheck "Block all cookies"
+3. Refresh the page
+            </div>
+            
+            <h4>Option 2: Use HTTP Instead</h4>
+            <p>Visit the app using HTTP instead of HTTPS:</p>
+            <div class="code">
+http://cosmo-bridge.vercel.app
+            </div>
+            
+            <h4>Option 3: Use the Setup Guide</h4>
+            <p>This page automatically handles mixed content issues. You can test your connection here:</p>
+            <button class="test-btn" onclick="testConnection()">Test Bridge Connection</button>
+        </div>
+
         <h3>Firewall Settings</h3>
         <div class="code">
 # macOS - Allow incoming connections
