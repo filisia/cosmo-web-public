@@ -42,12 +42,6 @@ fi
 if git show HEAD:DEPLOYMENT_GUIDE.md >/dev/null 2>&1; then
     git checkout HEAD -- DEPLOYMENT_GUIDE.md
 fi
-<<<<<<< Updated upstream
-=======
-if git show HEAD:vercel.json >/dev/null 2>&1; then
-    git checkout HEAD -- vercel.json
-fi
->>>>>>> Stashed changes
 
 # Check if there are any changes
 if git diff --quiet; then
@@ -60,8 +54,4 @@ else
     echo "✅ Sync completed successfully!"
 fi
 
-<<<<<<< Updated upstream
 echo "🎉 Sync process completed!" 
-=======
-echo "🎉 Sync process completed!"
->>>>>>> Stashed changes
