@@ -19,6 +19,25 @@ const getWebSocketUrlFromEnv = () => {
   return 'ws://localhost:8080';
 };
 
+// Wait for runtime config to be available
+const waitForRuntimeConfig = () => {
+  return new Promise((resolve) => {
+    if (typeof window !== 'undefined' && window.COSMO_CONFIG && window.COSMO_CONFIG.wsUrl) {
+      resolve(window.COSMO_CONFIG.wsUrl);
+    } else {
+      // Wait for runtime config to load
+      const checkConfig = () => {
+        if (typeof window !== 'undefined' && window.COSMO_CONFIG && window.COSMO_CONFIG.wsUrl) {
+          resolve(window.COSMO_CONFIG.wsUrl);
+        } else {
+          setTimeout(checkConfig, 100);
+        }
+      };
+      checkConfig();
+    }
+  });
+};
+
 const config = {
   wsUrl: getWebSocketUrlFromEnv(),
   development: {
@@ -33,7 +52,18 @@ const env = process.env.NODE_ENV || 'development';
 const baseConfig = config[env];
 
 // Handle mixed content issues and provide comprehensive user guidance
-const getWebSocketUrl = () => {
+const getWebSocketUrl = async () => {
+  // Wait for runtime config if we're in the browser
+  if (typeof window !== 'undefined') {
+    try {
+      const runtimeUrl = await waitForRuntimeConfig();
+      console.log('🔧 Using runtime WebSocket URL:', runtimeUrl);
+      return runtimeUrl;
+    } catch (error) {
+      console.warn('Failed to get runtime config, using fallback:', error);
+    }
+  }
+  
   const url = baseConfig.wsUrl;
   
   // Log the current configuration for debugging
@@ -52,67 +82,20 @@ const getWebSocketUrl = () => {
     console.warn('   2. Allow mixed content in browser settings');
     console.warn('   3. Update config.js to use wss:// if bridge supports it');
     console.warn('   4. Use a reverse proxy for secure WebSocket');
-    
-    // Show a comprehensive user-friendly message
-    setTimeout(() => {
-      const message = document.createElement('div');
-      message.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-        color: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        z-index: 10000;
-        max-width: 350px;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        font-size: 14px;
-        line-height: 1.5;
-        border-left: 4px solid #fff;
-      `;
-      message.innerHTML = `
-        <div style="margin-bottom: 12px;">
-          <strong style="font-size: 16px;">🔌 Connection Issue</strong>
-        </div>
-        <div style="margin-bottom: 12px;">
-          This site needs to connect to your local Cosmo Bridge app.
-        </div>
-        <div style="margin-bottom: 12px;">
-          <strong>Quick Fix:</strong> Visit via HTTP instead of HTTPS:
-          <br><a href="http://${window.location.hostname}" style="color: #fff; text-decoration: underline;">http://${window.location.hostname}</a>
-        </div>
-        <div style="font-size: 12px; opacity: 0.9;">
-          Or allow "mixed content" in your browser settings.
-        </div>
-        <button onclick="this.parentElement.remove()" style="
-          position: absolute;
-          top: 8px;
-          right: 8px;
-          background: none;
-          border: none;
-          color: white;
-          font-size: 18px;
-          cursor: pointer;
-          opacity: 0.7;
-        ">&times;</button>
-      `;
-      document.body.appendChild(message);
-      
-      // Auto-remove after 15 seconds
-      setTimeout(() => {
-        if (message.parentNode) {
-          message.parentNode.removeChild(message);
-        }
-      }, 15000);
-    }, 2000);
   }
   
   return url;
 };
 
+// For immediate use, return a promise-based config
 export default {
   ...baseConfig,
-  wsUrl: getWebSocketUrl()
+  get wsUrl() {
+    // If we're in the browser and runtime config is available, use it
+    if (typeof window !== 'undefined' && window.COSMO_CONFIG && window.COSMO_CONFIG.wsUrl) {
+      return window.COSMO_CONFIG.wsUrl;
+    }
+    return baseConfig.wsUrl;
+  },
+  getWebSocketUrl
 }; 
