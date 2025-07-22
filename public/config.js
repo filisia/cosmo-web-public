@@ -10,7 +10,7 @@ window.COSMO_CONFIG = {
   // - wss://your-domain.com/ws (secure WebSocket via proxy)
   // - wss://bridge.explorecosmo.com:8443 (secure WebSocket via proxy server)
   // - wss://bridge.explorecosmo.com/ws (secure WebSocket via Nginx proxy)
-  wsUrl: 'ws://localhost:8080',
+  wsUrl: window.location.protocol === 'https:' ? 'wss://localhost:8443' : 'ws://localhost:8080',
   
   // Additional configuration options
   debug: true,
