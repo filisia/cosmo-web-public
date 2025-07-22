@@ -9,11 +9,11 @@ window.COSMO_CONFIG = {
   // - ws://your-server-ip:8080 (remote bridge)
   // - wss://your-domain.com/ws (secure WebSocket via proxy)
   // - wss://bridge.explorecosmo.com:8443 (secure WebSocket via proxy server)
-  // - ws://localhost:8080 (Vercel deployment - works with local bridge)
-  wsUrl: 'ws://localhost:8080',
+  // - wss://bridge.explorecosmo.com/ws (secure WebSocket via Nginx proxy)
+  wsUrl: 'wss://bridge.explorecosmo.com/ws',
   
   // Additional configuration options
-  debug: false,
+  debug: true,
   reconnectAttempts: 5,
   reconnectDelay: 1000,
   
