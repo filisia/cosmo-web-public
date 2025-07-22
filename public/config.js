@@ -9,11 +9,11 @@ window.COSMO_CONFIG = {
   // - ws://192.168.1.14:8080 (local network - your actual IP)
   // - wss://your-domain.com/ws (secure WebSocket via proxy)
   // - wss://bridge.explorecosmo.com:8443 (secure WebSocket via proxy server)
-  // - wss://cosmo-coral.vercel.app/ws (Vercel deployment - needs proxy)
-  // - wss://bridge.explorecosmo.com/ws (custom domain - once configured)
+  // - wss://cosmo-bridge.vercel.app/ws (Vercel deployment - needs proxy)
+  // - wss://bridge.explorecosmo.com/ws (custom domain - configured and working)
   
-  // For local development with Vercel deployment:
-  wsUrl: 'ws://192.168.1.14:8080', // Your local IP address
+  // Production deployment with custom domain:
+  wsUrl: 'wss://bridge.explorecosmo.com/ws',
   
   // Additional configuration options
   debug: true,
@@ -29,8 +29,5 @@ window.COSMO_CONFIG = {
 // Log configuration for debugging
 if (window.COSMO_CONFIG.debug) {
   console.log('🔧 CosmoWeb Runtime Config:', window.COSMO_CONFIG);
-  console.log('💡 To connect to your local bridge:');
-  console.log('   1. Make sure your Cosmo Bridge is running on port 8080');
-  console.log('   2. Ensure your firewall allows connections on port 8080');
-  console.log('   3. Test connection: ws://192.168.1.14:8080');
+  console.log('🌐 Connected to production bridge at:', window.COSMO_CONFIG.wsUrl);
 } 
