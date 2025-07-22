@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/static/css/main.11da4d96.css",
+    "main.js": "/static/js/main.de40c7aa.js",
+    "static/js/787.511bcd28.chunk.js": "/static/js/787.511bcd28.chunk.js",
+    "static/media/GTWalsheimPro-Medium.ttf": "/static/media/GTWalsheimPro-Medium.bc56cfc10feb515d6622.ttf",
+    "static/media/GT-Walsheim-Pro-Regular.ttf": "/static/media/GT-Walsheim-Pro-Regular.e9bede63d79f52e86bbe.ttf",
+    "index.html": "/index.html",
+    "main.11da4d96.css.map": "/static/css/main.11da4d96.css.map",
+    "main.de40c7aa.js.map": "/static/js/main.de40c7aa.js.map",
+    "787.511bcd28.chunk.js.map": "/static/js/787.511bcd28.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.11da4d96.css",
+    "static/js/main.de40c7aa.js"
+  ]
+}
