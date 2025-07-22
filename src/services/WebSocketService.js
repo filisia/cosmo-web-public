@@ -14,21 +14,14 @@ class WebSocketService {
     this.heartbeatInterval = null;
     this.lastHeartbeat = null;
     this.heartbeatTimeout = null;
+    this.url = config.wsUrl;
     this.connectedDevices = [];
     this.connectionState = false;
     this.maxReconnectAttempts = 5;
     this.reconnectDelay = 1000;
-    
-    // Get URL dynamically from runtime config
-    this.getUrl = () => {
-      if (typeof window !== 'undefined' && window.COSMO_CONFIG && window.COSMO_CONFIG.wsUrl) {
-        return window.COSMO_CONFIG.wsUrl;
-      }
-      return config.wsUrl;
-    };
-    
-    console.log('[WebSocketService] Initialized');
+    console.log('[WebSocketService] Initialized with URL:', this.url);
     console.log('[WebSocketService] Current page protocol:', typeof window !== 'undefined' ? window.location.protocol : 'unknown');
+    console.log('[WebSocketService] WebSocket URL protocol:', this.url.startsWith('ws://') ? 'ws://' : this.url.startsWith('wss://') ? 'wss://' : 'unknown');
     
     // Auto-connect on initialization
     setTimeout(() => {
@@ -80,10 +73,10 @@ class WebSocketService {
     }
 
     this.state.connecting = true;
-    console.log(`[WebSocketService] Attempting to connect to WebSocket at ${this.getUrl()}`);
+    console.log(`[WebSocketService] Attempting to connect to WebSocket at ${this.url}`);
 
     try {
-      this.ws = new WebSocket(this.getUrl());
+      this.ws = new WebSocket(this.url);
 
       this.ws.onopen = () => {
         console.log('[WebSocketService] WebSocket Connected');
