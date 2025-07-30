@@ -68,12 +68,24 @@ export function WebSocketProvider({ children }) {
     switch (message.type) {
       case 'connected':
         setWsConnected(true);
+        addLog('Connected to local Cosmo Bridge app', 'success');
         console.log('[WebSocketContext] WebSocket connected');
         break;
 
       case 'disconnected':
         setWsConnected(false);
+        addLog('Disconnected from Cosmo Bridge app', 'warning');
         console.log('[WebSocketContext] WebSocket disconnected');
+        break;
+
+      case 'discovery_failed':
+        addLog(message.message || 'No local Cosmo Bridge app found', 'error');
+        console.log('[WebSocketContext] Discovery failed:', message.message);
+        break;
+
+      case 'max_reconnect_attempts_reached':
+        addLog('Max reconnection attempts reached. Please check if the Cosmo Bridge app is running.', 'error');
+        console.log('[WebSocketContext] Max reconnection attempts reached');
         break;
 
       case 'devices':

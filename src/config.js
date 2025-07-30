@@ -9,7 +9,12 @@ const getWebSocketUrl = () => {
   // Only use wss in production with HTTPS
   if (typeof window !== 'undefined') {
     const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-    return isProduction && window.location.protocol === 'https:' 
+    if (isProduction) {
+      // Production: try to discover the local Mac app
+      // This will attempt to connect to common local network addresses
+      return null; // Will be handled by the discovery mechanism
+    }
+    return window.location.protocol === 'https:' 
       ? 'wss://localhost:8443' 
       : 'ws://localhost:8080';
   }

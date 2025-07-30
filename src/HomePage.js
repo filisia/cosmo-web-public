@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import wsService from './services/WebSocketService';
 import { useWebSocket } from './contexts/WebSocketContext';
+import ConnectionStatus from './components/ConnectionStatus';
 import cosmoLogo from './assets/images/cosmo_logo.png';
 import { ReactComponent as AppleLogo } from './assets/icons/apple-logo.svg';
 import { ReactComponent as WindowsLogo } from './assets/icons/windows-logo.svg';
@@ -319,6 +320,9 @@ function HomePage({ colors }) {
             }}>
               CosmoWeb is a modern web interface for Filisia's Cosmo devices, providing real-time, interactive experiences for therapy, education, and play. Connect your Cosmo devices via the Cosmoid Bridge and control them directly from your browser.
             </p>
+            
+            {/* Connection Status */}
+            <ConnectionStatus />
             
             {/* Download buttons */}
             <div className="flex gap-4 mb-6">

@@ -20,6 +20,12 @@ class WebSocketService {
     this.maxReconnectAttempts = Infinity; // Keep trying indefinitely
     this.reconnectDelay = 1000;
     this.maxReconnectDelay = 10000; // Cap at 10 seconds
+    
+    // Discovery properties
+    this.discoveryInProgress = false;
+    this.discoveredHosts = [];
+    this.currentDiscoveryIndex = 0;
+    
     console.log('[WebSocketService] Initialized with URL:', this.url);
     
     // Auto-connect on initialization
@@ -58,6 +64,91 @@ class WebSocketService {
     });
   }
 
+  async discoverLocalHosts() {
+    if (this.discoveryInProgress) {
+      console.log('[WebSocketService] Discovery already in progress, skipping');
+      return;
+    }
+
+    this.discoveryInProgress = true;
+    console.log('[WebSocketService] Starting local network discovery...');
+
+    // Smart discovery - try most likely hosts first
+    const localHosts = [
+      'localhost',
+      '127.0.0.1',
+      // Common router IPs
+      '192.168.1.1',
+      '192.168.0.1',
+      '10.0.0.1',
+      // Common local IPs (try a few ranges)
+      '192.168.1.100',
+      '192.168.1.101',
+      '192.168.1.102',
+      '192.168.0.100',
+      '192.168.0.101',
+      '192.168.0.102',
+      '10.0.0.100',
+      '10.0.0.101',
+      '10.0.0.102'
+    ];
+
+    this.discoveredHosts = localHosts;
+    this.currentDiscoveryIndex = 0;
+
+    console.log(`[WebSocketService] Will try ${this.discoveredHosts.length} local hosts`);
+    this.tryNextHost();
+  }
+
+  async tryNextHost() {
+    if (!this.discoveryInProgress || this.currentDiscoveryIndex >= this.discoveredHosts.length) {
+      this.discoveryInProgress = false;
+      console.log('[WebSocketService] Discovery completed, no local Mac app found');
+      this.notifyListeners({ type: 'discovery_failed', message: 'No local Mac app found. Please ensure the Cosmo Bridge app is running.' });
+      return;
+    }
+
+    const host = this.discoveredHosts[this.currentDiscoveryIndex];
+    const port = window.location.protocol === 'https:' ? '8443' : '8080';
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const testUrl = `${protocol}://${host}:${port}`;
+
+    console.log(`[WebSocketService] Trying host ${this.currentDiscoveryIndex + 1}/${this.discoveredHosts.length}: ${testUrl}`);
+
+    try {
+      const testWs = new WebSocket(testUrl);
+      
+      const timeout = setTimeout(() => {
+        testWs.close();
+      }, 2000); // 2 second timeout
+
+      testWs.onopen = () => {
+        clearTimeout(timeout);
+        console.log(`[WebSocketService] Found local Mac app at ${testUrl}`);
+        this.discoveryInProgress = false;
+        this.url = testUrl;
+        this.connect();
+      };
+
+      testWs.onerror = () => {
+        clearTimeout(timeout);
+        this.currentDiscoveryIndex++;
+        setTimeout(() => this.tryNextHost(), 100); // Small delay between attempts
+      };
+
+      testWs.onclose = () => {
+        clearTimeout(timeout);
+        this.currentDiscoveryIndex++;
+        setTimeout(() => this.tryNextHost(), 100);
+      };
+
+    } catch (error) {
+      console.log(`[WebSocketService] Error testing ${testUrl}:`, error);
+      this.currentDiscoveryIndex++;
+      setTimeout(() => this.tryNextHost(), 100);
+    }
+  }
+
   connect() {
     console.log('[WebSocketService] Connect called. Current state:', {
       connecting: this.state.connecting,
@@ -68,6 +159,13 @@ class WebSocketService {
 
     if (this.state.connecting || this.state.connected) {
       console.log('[WebSocketService] Already connecting or connected, skipping connect');
+      return;
+    }
+
+    // If no URL is set (production mode), start discovery
+    if (!this.url) {
+      console.log('[WebSocketService] No URL set, starting local discovery...');
+      this.discoverLocalHosts();
       return;
     }
 
@@ -98,19 +196,25 @@ class WebSocketService {
         this.connectionState = false;
         this.notifyListeners({ type: 'disconnected' });
 
-        if (this.state.shouldReconnect) {
+        // If this was a discovery connection that failed, try next host
+        if (this.discoveryInProgress) {
+          this.currentDiscoveryIndex++;
+          setTimeout(() => this.tryNextHost(), 100);
+          return;
+        }
+
+        // Regular reconnection logic
+        if (this.state.shouldReconnect && this.state.reconnectAttempts < this.maxReconnectAttempts) {
           this.state.reconnectAttempts++;
-          // Use a longer delay after several attempts, but cap it
-          const baseDelay = this.state.reconnectAttempts <= 5 
-            ? 1000 * Math.pow(2, this.state.reconnectAttempts - 1) 
-            : this.maxReconnectDelay;
-          const delay = Math.min(baseDelay, this.maxReconnectDelay);
-          console.log(`[WebSocketService] Attempting to reconnect in ${delay}ms (attempt ${this.state.reconnectAttempts})...`);
+          const delay = Math.min(this.reconnectDelay * Math.pow(2, this.state.reconnectAttempts - 1), this.maxReconnectDelay);
+          console.log(`[WebSocketService] Attempting to reconnect in ${delay}ms (attempt ${this.state.reconnectAttempts})`);
+          
           this.reconnectTimeout = setTimeout(() => {
             this.connect();
           }, delay);
-        } else {
-          console.log('[WebSocketService] Not attempting reconnect - shouldReconnect is false');
+        } else if (this.state.reconnectAttempts >= this.maxReconnectAttempts) {
+          console.log('[WebSocketService] Max reconnection attempts reached');
+          this.notifyListeners({ type: 'max_reconnect_attempts_reached' });
         }
       };
 
