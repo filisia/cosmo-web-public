@@ -24,14 +24,9 @@ const getWebSocketUrl = () => {
     return isHTTPS ? `wss://${host}:${port}` : `ws://${host}:${port}`;
   }
   
-  if (isDevelopment) {
-    // Development: always use ws://localhost:8080
-    return 'ws://localhost:8080';
-  } else {
-    // Production: try to discover the local Mac app
-    // This will attempt to connect to common local network addresses
-    return null; // Will be handled by the discovery mechanism
-  }
+  // Always use localhost - works from Vercel to user's local machine
+  // Modern browsers allow HTTPS sites to connect to ws://localhost
+  return 'ws://localhost:8080';
 };
 
 window.COSMO_CONFIG = {
@@ -55,7 +50,7 @@ window.COSMO_CONFIG = {
 };
 
 // Instructions for deployment:
-// The app now automatically discovers local Cosmo Bridge apps
+// The app automatically connects to the local Cosmo Bridge app on localhost:8080
 // No manual configuration needed - just ensure the Mac app is running
 // For testing, you can use URL parameters: ?wsHost=192.168.1.100&wsPort=8443
 

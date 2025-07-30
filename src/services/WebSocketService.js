@@ -21,10 +21,7 @@ class WebSocketService {
     this.reconnectDelay = 1000;
     this.maxReconnectDelay = 10000; // Cap at 10 seconds
     
-    // Discovery properties
-    this.discoveryInProgress = false;
-    this.discoveredHosts = [];
-    this.currentDiscoveryIndex = 0;
+    // Discovery properties removed - now always connects to localhost:8080
     
     console.log('[WebSocketService] Initialized with URL:', this.url);
     
@@ -64,90 +61,7 @@ class WebSocketService {
     });
   }
 
-  async discoverLocalHosts() {
-    if (this.discoveryInProgress) {
-      console.log('[WebSocketService] Discovery already in progress, skipping');
-      return;
-    }
-
-    this.discoveryInProgress = true;
-    console.log('[WebSocketService] Starting local network discovery...');
-
-    // Smart discovery - try most likely hosts first
-    const localHosts = [
-      'localhost',
-      '127.0.0.1',
-      // Common router IPs
-      '192.168.1.1',
-      '192.168.0.1',
-      '10.0.0.1',
-      // Common local IPs (try a few ranges)
-      '192.168.1.100',
-      '192.168.1.101',
-      '192.168.1.102',
-      '192.168.0.100',
-      '192.168.0.101',
-      '192.168.0.102',
-      '10.0.0.100',
-      '10.0.0.101',
-      '10.0.0.102'
-    ];
-
-    this.discoveredHosts = localHosts;
-    this.currentDiscoveryIndex = 0;
-
-    console.log(`[WebSocketService] Will try ${this.discoveredHosts.length} local hosts`);
-    this.tryNextHost();
-  }
-
-  async tryNextHost() {
-    if (!this.discoveryInProgress || this.currentDiscoveryIndex >= this.discoveredHosts.length) {
-      this.discoveryInProgress = false;
-      console.log('[WebSocketService] Discovery completed, no local Mac app found');
-      this.notifyListeners({ type: 'discovery_failed', message: 'No local Mac app found. Please ensure the Cosmo Bridge app is running.' });
-      return;
-    }
-
-    const host = this.discoveredHosts[this.currentDiscoveryIndex];
-    const port = window.location.protocol === 'https:' ? '8443' : '8080';
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const testUrl = `${protocol}://${host}:${port}`;
-
-    console.log(`[WebSocketService] Trying host ${this.currentDiscoveryIndex + 1}/${this.discoveredHosts.length}: ${testUrl}`);
-
-    try {
-      const testWs = new WebSocket(testUrl);
-      
-      const timeout = setTimeout(() => {
-        testWs.close();
-      }, 2000); // 2 second timeout
-
-      testWs.onopen = () => {
-        clearTimeout(timeout);
-        console.log(`[WebSocketService] Found local Mac app at ${testUrl}`);
-        this.discoveryInProgress = false;
-        this.url = testUrl;
-        this.connect();
-      };
-
-      testWs.onerror = () => {
-        clearTimeout(timeout);
-        this.currentDiscoveryIndex++;
-        setTimeout(() => this.tryNextHost(), 100); // Small delay between attempts
-      };
-
-      testWs.onclose = () => {
-        clearTimeout(timeout);
-        this.currentDiscoveryIndex++;
-        setTimeout(() => this.tryNextHost(), 100);
-      };
-
-    } catch (error) {
-      console.log(`[WebSocketService] Error testing ${testUrl}:`, error);
-      this.currentDiscoveryIndex++;
-      setTimeout(() => this.tryNextHost(), 100);
-    }
-  }
+  // Discovery methods removed - now always connects directly to localhost:8080
 
   connect() {
     console.log('[WebSocketService] Connect called. Current state:', {
@@ -162,10 +76,10 @@ class WebSocketService {
       return;
     }
 
-    // If no URL is set (production mode), start discovery
+    // URL should always be set to localhost:8080 now
     if (!this.url) {
-      console.log('[WebSocketService] No URL set, starting local discovery...');
-      this.discoverLocalHosts();
+      console.error('[WebSocketService] No URL configured - this should not happen');
+      this.notifyListeners({ type: 'no_url_configured', message: 'No connection URL configured' });
       return;
     }
 
@@ -196,14 +110,7 @@ class WebSocketService {
         this.connectionState = false;
         this.notifyListeners({ type: 'disconnected' });
 
-        // If this was a discovery connection that failed, try next host
-        if (this.discoveryInProgress) {
-          this.currentDiscoveryIndex++;
-          setTimeout(() => this.tryNextHost(), 100);
-          return;
-        }
-
-        // Regular reconnection logic
+        // Reconnection logic
         if (this.state.shouldReconnect && this.state.reconnectAttempts < this.maxReconnectAttempts) {
           this.state.reconnectAttempts++;
           const delay = Math.min(this.reconnectDelay * Math.pow(2, this.state.reconnectAttempts - 1), this.maxReconnectDelay);
