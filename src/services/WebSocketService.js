@@ -76,22 +76,20 @@ class WebSocketService {
     // Smart discovery - try most likely hosts first
     const localHosts = [
       'localhost',
-      '127.0.0.1',
-      // Common router IPs
-      '192.168.1.1',
-      '192.168.0.1',
-      '10.0.0.1',
-      // Common local IPs (try a few ranges)
-      '192.168.1.100',
-      '192.168.1.101',
-      '192.168.1.102',
-      '192.168.0.100',
-      '192.168.0.101',
-      '192.168.0.102',
-      '10.0.0.100',
-      '10.0.0.101',
-      '10.0.0.102'
+      '127.0.0.1'
     ];
+    
+    // Add common router IPs
+    localHosts.push('192.168.1.1', '192.168.0.1', '10.0.0.1');
+    
+    // Add common IP ranges (2-50 for each subnet)
+    for (let i = 2; i <= 50; i++) {
+      localHosts.push(`192.168.1.${i}`);
+      localHosts.push(`192.168.0.${i}`);
+      if (i <= 20) { // Fewer for 10.x range
+        localHosts.push(`10.0.0.${i}`);
+      }
+    }
 
     this.discoveredHosts = localHosts;
     this.currentDiscoveryIndex = 0;
@@ -120,7 +118,7 @@ class WebSocketService {
       
       const timeout = setTimeout(() => {
         testWs.close();
-      }, 2000); // 2 second timeout
+      }, 1000); // 1 second timeout for faster discovery
 
       testWs.onopen = () => {
         clearTimeout(timeout);
