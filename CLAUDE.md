@@ -1,19 +1,21 @@
 # Cosmoweb Project - Development Assistant Guide
 
 ## Project Overview
-Cosmoweb is a React-based web application that interfaces with Filisia's Cosmo BLE devices through a WebSocket bridge. The system enables real-time button press detection, device control, and multi-device management.
+Cosmoweb is a React-based web application that interfaces with Filisia's Cosmo BLE devices through a WebSocket bridge. The system enables real-time button press detection, device control, and multi-device management. The app is designed to work from Vercel (cloud hosting) while connecting to users' local Mac applications.
 
 ## Architecture
 ```
 Cosmo BLE Device → Cosmoid Bridge (WebSocket Server) → Cosmoweb (React Client)
+                   [Local Mac App - localhost:8080]    [Vercel Hosted App]
 ```
 
 ## Key Technologies
 - **Frontend**: React 18+ with functional components, hooks, Tailwind CSS
-- **Communication**: WebSocket (`ws://localhost:8080`)
+- **Communication**: WebSocket (`ws://localhost:8080`) - **Always connects to localhost**
 - **State Management**: React Context API
-- **Bridge**: Node.js/Electron WebSocket server
+- **Bridge**: Node.js/Electron WebSocket server (Mac app)
 - **Hardware**: Cosmo devices with button, LED, vibration capabilities
+- **Deployment**: Vercel for web app, local installation for bridge app
 
 ## Core Components
 
@@ -122,6 +124,112 @@ Cosmo BLE Device → Cosmoid Bridge (WebSocket Server) → Cosmoweb (React Clien
 - **Integration Tests**: End-to-end button press flows
 - **Message Validation**: Protocol compliance and error handling
 - **Performance Tests**: Rate limiting and connection stability
+
+## Vercel-to-Localhost Connection Architecture
+
+### Overview
+The core innovation of this project is enabling a Vercel-hosted web application to connect directly to users' local Mac applications via WebSocket. This eliminates the need for complex network discovery, ngrok tunneling, or manual IP configuration.
+
+### How It Works
+1. **Vercel app loads** → Configuration returns `'ws://localhost:8080'`
+2. **Browser interprets `localhost`** → Points to user's local machine (where Mac app runs)
+3. **Mac app accepts connection** → Because it's listening on all interfaces (0.0.0.0:8080)
+4. **Connection established** → Real-time communication works! 🎯
+
+### Technical Implementation
+
+#### Web App Configuration
+- **`src/config.js`**: Always returns `'ws://localhost:8080'` (no environment detection)
+- **`public/config.js`**: Runtime config also returns `'ws://localhost:8080'`
+- **`src/services/WebSocketService.js`**: Simplified to direct connection (no discovery mechanism)
+
+#### Mac App Configuration
+- **`mac/src/main/ws-server.js`**: Binds to `0.0.0.0:8080` (all interfaces)
+- **Port range**: 8080-8090 (tries 8080 first, which matches web app)
+- **Regular WebSocket**: Uses `ws://` protocol (not `wss://`)
+
+#### Browser Security Model
+- **HTTPS → WS Localhost**: Modern browsers allow HTTPS sites to connect to `ws://localhost`
+- **Same-Origin Exception**: Localhost connections are treated as secure context
+- **No CORS Issues**: Localhost connections bypass CORS restrictions
+
+### Previous Problems Solved
+
+#### ❌ Discovery Mechanism (Removed)
+```javascript
+// OLD: Problematic approach
+if (isProduction) {
+  return null; // Triggered discovery
+}
+// Discovery tried to scan 192.168.x.x, 10.0.0.x networks
+// This failed from Vercel because cloud apps can't scan local networks
+```
+
+#### ✅ Direct Localhost Connection (Current)
+```javascript
+// NEW: Simple and effective
+return 'ws://localhost:8080'; // Always works from any hosting environment
+```
+
+### Configuration Files Details
+
+#### `src/config.js`
+```javascript
+const getWebSocketUrl = () => {
+  // Check for runtime configuration override
+  if (typeof window !== 'undefined' && window.COSMO_CONFIG && window.COSMO_CONFIG.wsUrl) {
+    return window.COSMO_CONFIG.wsUrl;
+  }
+  
+  // Always connect to localhost:8080 - works from Vercel to user's local machine
+  return 'ws://localhost:8080';
+};
+```
+
+#### `public/config.js`
+```javascript
+const getWebSocketUrl = () => {
+  // Allow URL parameter override for testing
+  if (wsHostOverride) {
+    const host = wsHostOverride;
+    const port = wsPortOverride || (isHTTPS ? '8443' : '8080');
+    return isHTTPS ? `wss://${host}:${port}` : `ws://${host}:${port}`;
+  }
+  
+  // Always use localhost - works from Vercel to user's local machine
+  return 'ws://localhost:8080';
+};
+```
+
+### Testing Override
+For manual testing, you can still use URL parameters:
+```
+https://your-app.vercel.app?wsHost=192.168.1.100&wsPort=8443
+```
+
+### Deployment Workflow
+1. **Develop locally**: Both web app and Mac app run on localhost
+2. **Test locally**: Verify connection between local web app and Mac app
+3. **Deploy to Vercel**: Web app automatically connects to users' local Mac apps
+4. **Users install Mac app**: Bridge app runs locally, accepts connections from Vercel app
+
+### Error Handling
+- **Mac app not running**: Connection fails, shows appropriate UI message
+- **Wrong port**: Mac app tries ports 8080-8090, web app uses 8080
+- **Firewall blocking**: Users may need to allow Mac app through firewall
+- **No URL configured**: Should not happen with current config, but handled gracefully
+
+### Success Indicators
+- ✅ **Vercel app connects to localhost:8080**
+- ✅ **No discovery mechanism needed**
+- ✅ **No manual IP configuration required**
+- ✅ **Works on all user networks (home, office, cafe)**
+- ✅ **No ngrok or tunneling services needed**
+
+### References
+- **Working example**: `https://cosmoids.vercel.app/` (uses this exact pattern)
+- **Browser compatibility**: All modern browsers (Chrome, Safari, Firefox, Edge)
+- **Security**: HTTPS sites can connect to localhost WebSocket servers
 
 ## Commands
 - Run development server: `npm start`
