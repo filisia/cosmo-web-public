@@ -10,7 +10,6 @@ function ConnectionStatus() {
   };
 
   const getStatusText = () => {
-    if (wsConnected) return 'Connected to Cosmo Bridge';
     return '';
   };
 
@@ -47,7 +46,6 @@ function ConnectionStatus() {
         <div className="flex items-center space-x-2">
           <span className="text-lg">{getStatusIcon()}</span>
           <div>
-            <h3 className="font-medium">{getStatusText()}</h3>
             <p className="text-sm opacity-80">{getHelpText()}</p>
           </div>
         </div>
