@@ -1,15 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import wsService from '../services/WebSocketService';
-import { getCharacteristicUUID, getOperationFromUUID } from '../utils/characteristics';
+import { getCharacteristicUUID } from '../utils/characteristics';
 
 const WebSocketContext = createContext(null);
 
 export function WebSocketProvider({ children }) {
   const [wsConnected, setWsConnected] = useState(false);
-  const [connectionError, setConnectionError] = useState(null);
+  const [connectionError] = useState(null);
   const [connectedDevices, setConnectedDevices] = useState([]);
   const [deviceValues, setDeviceValues] = useState({});
-  const [lockState, setLockState] = useState({ isLocked: false, deviceIds: [] });
+  const [lockState] = useState({ isLocked: false, deviceIds: [] });
   const [connectionLogs, setConnectionLogs] = useState([]);
 
   const addLog = useCallback((message, level = 'info') => {
@@ -61,6 +61,7 @@ export function WebSocketProvider({ children }) {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleMessage = useCallback((message) => {
     console.log('[WebSocketContext] Handling message:', message.type, message);
 
@@ -180,11 +181,10 @@ export function WebSocketProvider({ children }) {
       default:
         console.log('[WebSocketContext] Unhandled message type:', message.type);
     }
-  }, [wsService]);
+  }, []);
 
   useEffect(() => {
     // console.log('[WebSocketContext] Setting up WebSocket connection');
-    let mounted = true;
 
     // Connect to WebSocket
     // console.log('[WebSocketContext] Initiating WebSocket connection');
@@ -197,11 +197,16 @@ export function WebSocketProvider({ children }) {
     // Cleanup on unmount
     return () => {
       // console.log('[WebSocketContext] Cleaning up WebSocket connection');
-      mounted = false;
       removeListener();
-      wsService.disconnect();
+      // In development, React Strict Mode causes double mounting
+      // Don't permanently disconnect, just temporarily close the connection
+      if (process.env.NODE_ENV === 'production') {
+        wsService.disconnect(true); // Permanent disconnect in production
+      } else {
+        wsService.disconnect(false); // Temporary disconnect in development
+      }
     };
-  }, []);
+  }, [handleMessage]);
 
   const value = {
     wsConnected,

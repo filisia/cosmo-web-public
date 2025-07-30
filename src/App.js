@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, useLocation } from 'react-router-dom';
 import './style.css';
 // import GamePress from './GamePress';
 import HomePage from './HomePage';
@@ -13,6 +13,70 @@ import ExerciseGame from './components/ExerciseGame';
 import VisualMusic from './components/VisualMusic';
 import cosmoLogo from './assets/images/cosmo_logo.png';
 
+function Navigation() {
+  const location = useLocation();
+  
+  const isActive = (path) => {
+    if (path === '/' && location.pathname === '/') return true;
+    if (path !== '/' && location.pathname.startsWith(path)) return true;
+    return false;
+  };
+  
+  return (
+    <header className="bg-white border-b border-gray-200" style={{ padding: '24px 80px' }}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <img 
+            src={cosmoLogo} 
+            alt="Cosmo Logo" 
+            style={{ 
+              width: '164px', 
+              height: '32px', 
+              objectFit: 'contain' 
+            }} 
+          />
+        </div>
+        <div className="flex items-center gap-3">
+          <Link 
+            to="/" 
+            className={`px-6 py-4 rounded-lg border ${
+              isActive('/')
+                ? 'text-white border-purple-700'
+                : 'text-purple-700 border-purple-700 hover:bg-purple-50'
+            }`}
+            style={{
+              fontSize: '16px',
+              fontFamily: 'GT Walsheim Pro, sans-serif',
+              fontWeight: '700',
+              ...(isActive('/') ? {backgroundColor: '#7B1C93'} : {}),
+              borderColor: '#7B1C93'
+            }}
+          >
+            Home
+          </Link>
+          <Link 
+            to="/exercise-settings" 
+            className={`px-6 py-4 rounded-lg border ${
+              isActive('/exercise')
+                ? 'text-white border-purple-700'
+                : 'text-purple-700 border-purple-700 hover:bg-purple-50'
+            }`}
+            style={{
+              fontSize: '16px',
+              fontFamily: 'GT Walsheim Pro, sans-serif',
+              fontWeight: '700',
+              ...(isActive('/exercise') ? {backgroundColor: '#7B1C93'} : {}),
+              borderColor: '#7B1C93'
+            }}
+          >
+            Test Activity
+          </Link>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 function App() {
   // Define colors array for the HomePage circles
   const colors = ['blue', 'green', 'yellow', 'orange', 'red', 'purple'];
@@ -21,44 +85,10 @@ function App() {
     <GameSettingsProvider>
       <WebSocketProvider>
         <Router>
-          <div className="min-h-screen bg-gray-100">
-            <nav className="bg-white shadow-lg">
-              <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                  <img src={cosmoLogo} alt="Cosmo Logo" style={{ width: 80, objectFit: 'contain' }} />
-                </div>
-                <div className="flex justify-center flex-1">
-                  <ul className="flex space-x-8 py-4">
-                    <li>
-                      <Link 
-                        to="/" 
-                        className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-                      >
-                        Home
-                      </Link>
-                    </li>
-                    <li>
-                      <Link 
-                        to="/exercise-settings" 
-                        className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-                      >
-                        Exercise
-                      </Link>
-                    </li>
-                    <li>
-                      <Link 
-                        to="/visual-music" 
-                        className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-                      >
-                        Visual Music
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </nav>
+          <div className="min-h-screen bg-white">
+            <Navigation />
 
-            <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <main>
               <Routes>
                 <Route 
                   path="/" 

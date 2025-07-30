@@ -5,10 +5,15 @@ const getWebSocketUrl = () => {
     return window.COSMO_CONFIG.wsUrl;
   }
   
-  // Default fallback - use secure WebSocket for HTTPS
-  return typeof window !== 'undefined' && window.location.protocol === 'https:' 
-    ? 'wss://localhost:8443' 
-    : 'ws://localhost:8080';
+  // Default fallback - for development, always use ws://localhost:8080
+  // Only use wss in production with HTTPS
+  if (typeof window !== 'undefined') {
+    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    return isProduction && window.location.protocol === 'https:' 
+      ? 'wss://localhost:8443' 
+      : 'ws://localhost:8080';
+  }
+  return 'ws://localhost:8080';
 };
 
 const config = {

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmo Bridge Setup Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 25px;
+        }
+        .step {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+        .step-number {
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .code {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .download-btn {
+            background: #3498db;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 10px 5px;
+            transition: background 0.3s;
+        }
+        .download-btn:hover {
+            background: #2980b9;
+        }
+        .test-btn {
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .test-btn:hover {
+            background: #229954;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.connected { background: #d4edda; color: #155724; }
+        .status.disconnected { background: #f8d7da; color: #721c24; }
+        .status.connecting { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 Cosmo Bridge Setup Guide</h1>
+        
+        <div class="info">
+            <strong>Welcome!</strong> This guide will help you set up your local Cosmo Bridge to connect with this web application.
+        </div>
+
+        <h2>📋 Overview</h2>
+        <p>
+            The Cosmo Web App connects to your local Cosmo Bridge application, which manages communication with your Cosmo devices. 
+            Each user needs their own local bridge running on their computer.
+        </p>
+
+        <h2>🚀 Quick Setup (3 Steps)</h2>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <strong>Download & Install Cosmo Bridge</strong>
+            <p>Download the Cosmo Bridge application for your operating system:</p>
+            <a href="https://github.com/your-repo/cosmo-bridge/releases" class="download-btn">Download for macOS</a>
+            <a href="https://github.com/your-repo/cosmo-bridge/releases" class="download-btn">Download for Windows</a>
+            <a href="https://github.com/your-repo/cosmo-bridge/releases" class="download-btn">Download for Linux</a>
+        </div>
+
+        <div class="step">
+            <div class="step-number">2</div>
+            <strong>Start the Bridge</strong>
+            <p>After installation, launch the Cosmo Bridge application. It will automatically start a WebSocket server on port 8080.</p>
+            <div class="code">
+                # The bridge will be available at:
+                ws://localhost:8080
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">3</div>
+            <strong>Test the Connection</strong>
+            <p>Click the button below to test if your bridge is running and accessible:</p>
+            <button class="test-btn" onclick="testConnection()">Test Bridge Connection</button>
+            <div id="connectionStatus" class="status disconnected">Not connected</div>
+        </div>
+
+        <h2>🔧 Manual Installation</h2>
+
+        <h3>macOS Installation</h3>
+        <div class="code">
+# Download the latest release
+curl -L -o cosmo-bridge.dmg https://github.com/your-repo/cosmo-bridge/releases/latest/download/cosmo-bridge-mac.dmg
+
+# Mount and install
+hdiutil attach cosmo-bridge.dmg
+cp -R /Volumes/CosmoBridge/CosmoBridge.app /Applications/
+hdiutil detach /Volumes/CosmoBridge
+        </div>
+
+        <h3>Windows Installation</h3>
+        <div class="code">
+# Download the installer
+# Run the .exe file and follow the installation wizard
+
+# Or use winget (if available)
+winget install CosmoBridge
+        </div>
+
+        <h3>Linux Installation</h3>
+        <div class="code">
+# Download the AppImage
+wget https://github.com/your-repo/cosmo-bridge/releases/latest/download/cosmo-bridge-linux.AppImage
+
+# Make executable
+chmod +x cosmo-bridge-linux.AppImage
+
+# Run
+./cosmo-bridge-linux.AppImage
+        </div>
+
+        <h2>🔍 Troubleshooting</h2>
+
+        <h3>Connection Issues</h3>
+        <div class="warning">
+            <strong>If the connection test fails:</strong>
+            <ul>
+                <li>Make sure the Cosmo Bridge application is running</li>
+                <li>Check that port 8080 is not blocked by your firewall</li>
+                <li>Try restarting the bridge application</li>
+                <li>Check the bridge application logs for errors</li>
+            </ul>
+        </div>
+
+        <h3>Mixed Content Issues (HTTPS)</h3>
+        <div class="warning">
+            <strong>If you see "Mixed Content" errors:</strong>
+            <p>This happens because the web app uses HTTPS but tries to connect to a non-secure WebSocket. Here are solutions:</p>
+            
+            <h4>Option 1: Allow Mixed Content (Recommended)</h4>
+            <div class="code">
+# Chrome/Edge:
+1. Click the lock icon 🔒 in the address bar
+2. Click "Site settings"
+3. Find "Insecure content" and change to "Allow"
+4. Refresh the page
+
+# Firefox:
+1. Click the shield icon 🛡️ in the address bar
+2. Click "Site permissions"
+3. Find "Access your location" and change to "Allow"
+4. Refresh the page
+
+# Safari:
+1. Go to Safari > Preferences > Security
+2. Uncheck "Block all cookies"
+3. Refresh the page
+            </div>
+            
+            <h4>Option 2: Use HTTP Instead</h4>
+            <p>Visit the app using HTTP instead of HTTPS:</p>
+            <div class="code">
+http://cosmo-bridge.vercel.app
+            </div>
+            
+            <h4>Option 3: Use the Setup Guide</h4>
+            <p>This page automatically handles mixed content issues. You can test your connection here:</p>
+            <button class="test-btn" onclick="testConnection()">Test Bridge Connection</button>
+        </div>
+
+        <h3>Firewall Settings</h3>
+        <div class="code">
+# macOS - Allow incoming connections
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /Applications/CosmoBridge.app
+
+# Windows - Add firewall rule
+netsh advfirewall firewall add rule name="CosmoBridge" dir=in action=allow program="C:\Program Files\CosmoBridge\CosmoBridge.exe"
+
+# Linux - Allow port 8080
+sudo ufw allow 8080
+        </div>
+
+        <h3>Port Already in Use</h3>
+        <div class="code">
+# Check what's using port 8080
+lsof -i :8080
+
+# Kill the process if needed
+kill -9 [PID]
+        </div>
+
+        <h2>📱 Connecting Devices</h2>
+        <p>Once your bridge is running and connected:</p>
+        <ol>
+            <li>Turn on your Cosmo device</li>
+            <li>Put it in pairing mode (usually by holding a button)</li>
+            <li>The bridge will automatically detect and connect to your device</li>
+            <li>Your device will appear in the web app</li>
+        </ol>
+
+        <h2>🌐 Advanced Configuration</h2>
+
+        <h3>Custom WebSocket URL</h3>
+        <p>If you need to connect to a bridge on a different computer or port:</p>
+        <div class="code">
+// Open browser console and run:
+window.COSMO_CONFIG = {
+  wsUrl: 'ws://your-bridge-ip:8080',
+  debug: true
+};
+// Then refresh the page
+        </div>
+
+        <h3>Network Bridge Setup</h3>
+        <p>To allow other devices on your network to connect:</p>
+        <div class="code">
+# Configure bridge to listen on all interfaces
+# Edit bridge configuration to use 0.0.0.0:8080 instead of localhost:8080
+        </div>
+
+        <h2>📞 Support</h2>
+        <p>If you continue to have issues:</p>
+        <ul>
+            <li>Check the <a href="https://github.com/your-repo/cosmo-bridge/issues">GitHub Issues</a></li>
+            <li>Review the <a href="https://github.com/your-repo/cosmo-bridge/wiki">Documentation</a></li>
+            <li>Join our <a href="https://discord.gg/cosmo">Discord Community</a></li>
+        </ul>
+
+        <div class="success">
+            <strong>🎉 You're all set!</strong> Once your bridge is connected, you can return to the main application and start using your Cosmo devices.
+        </div>
+    </div>
+
+    <script>
+        function testConnection() {
+            const statusDiv = document.getElementById('connectionStatus');
+            statusDiv.textContent = 'Testing connection...';
+            statusDiv.className = 'status connecting';
+            
+            const ws = new WebSocket('ws://localhost:8080');
+            
+            ws.onopen = function() {
+                statusDiv.textContent = '✅ Connected successfully!';
+                statusDiv.className = 'status connected';
+                
+                // Send a test message
+                ws.send(JSON.stringify({
+                    type: 'ping',
+                    timestamp: Date.now()
+                }));
+            };
+            
+            ws.onmessage = function(event) {
+                console.log('Received:', event.data);
+            };
+            
+            ws.onerror = function(error) {
+                statusDiv.textContent = '❌ Connection failed - Bridge not running';
+                statusDiv.className = 'status disconnected';
+                console.error('WebSocket error:', error);
+            };
+            
+            ws.onclose = function() {
+                if (statusDiv.textContent.includes('Testing')) {
+                    statusDiv.textContent = '❌ Connection failed - Bridge not running';
+                    statusDiv.className = 'status disconnected';
+                }
+            };
+            
+            // Timeout after 5 seconds
+            setTimeout(() => {
+                if (ws.readyState === WebSocket.CONNECTING) {
+                    statusDiv.textContent = '⏰ Connection timeout - Check if bridge is running';
+                    statusDiv.className = 'status disconnected';
+                    ws.close();
+                }
+            }, 5000);
+        }
+        
+        // Auto-test connection on page load
+        window.addEventListener('load', () => {
+            setTimeout(testConnection, 1000);
+        });
+    </script>
+</body>
+</html> 

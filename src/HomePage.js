@@ -1,183 +1,541 @@
 // HomePage.js
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import wsService from './services/WebSocketService';
 import { useWebSocket } from './contexts/WebSocketContext';
 import cosmoLogo from './assets/images/cosmo_logo.png';
+import { ReactComponent as AppleLogo } from './assets/icons/apple-logo.svg';
+import { ReactComponent as WindowsLogo } from './assets/icons/windows-logo.svg';
 
 function HomePage({ colors }) {
-  const { 
-    wsConnected, 
-    connectionError, 
-    connectedDevices, 
-    deviceInfo, 
-    deviceValues 
-  } = useWebSocket();
+  const navigate = useNavigate();
+  const { wsConnected, connectionError, connectedDevices } = useWebSocket();
   
-  const [lockState, setLockState] = useState({ isLocked: false, deviceIds: [] });
-  const [lastScanTime, setLastScanTime] = useState(new Date());
-
-  // Debug: Log connected devices and their connection status
-  React.useEffect(() => {
-    if (connectedDevices && connectedDevices.length > 0) {
-      console.log('HomePage - Connected Devices:', connectedDevices.map(device => ({
-        id: device.id,
-        name: device.name,
-        connected: device.connected,
-        status: device.status,
-        serial: device.serial,
-        firmware: device.firmware,
-        batteryLevel: device.batteryLevel
-      })));
-    }
-  }, [connectedDevices]);
-
-  // Handle lock/unlock functionality
-  const handleLockDevices = () => {
-    const newLockState = !lockState.isLocked;
-    const deviceIds = newLockState ? connectedDevices.filter(d => d.connected).map(d => d.id) : [];
-    
-    const lockMessage = {
-      type: 'lockDevices',
-      isLocked: newLockState,
-      deviceIds: deviceIds
-    };
-    
-    wsService.sendMessage(lockMessage);
-    setLockState({ isLocked: newLockState, deviceIds });
+  const [lockState] = useState({ isLocked: false, deviceIds: [] });
+  const [activeTab, setActiveTab] = useState('Home');
+  
+  const handleLaunchTestActivity = () => {
+    navigate('/exercise-settings');
   };
 
-  // Handle scan devices
-  const handleScanDevices = () => {
-    const scanMessage = { type: 'getDevices' };
-    wsService.sendMessage(scanMessage);
-    setLastScanTime(new Date());
-  };
-
-  // Format time for display
-  const formatTime = (date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  // Get device status display
   const getDeviceStatus = (device) => {
-    if (device.status === 'available') return 'Available';
-    if (device.connected) return 'Connected';
-    return 'Available';
+    if (device.connected || device.status === 'connected') return 'Connected';
+    return 'Disconnected';
   };
 
-  // Get status CSS class
   const getStatusClass = (device) => {
-    if (device.status === 'available') return 'status-available';
-    if (device.connected) return 'status-connected';
-    return 'status-available';
+    return device.connected || device.status === 'connected' ? 'text-green-600' : 'text-red-600';
   };
 
-  // Always render the hero section with logo and info
-  const HeroSection = (
-    <div className="bg-white rounded-xl shadow-md p-8 mb-8 flex flex-col md:flex-row items-center gap-8">
-      <div>
-        <h1 className="text-3xl font-bold text-purple-800 mb-2">Welcome to Cosmoweb</h1>
-        <p className="text-gray-700 text-lg mb-2 max-w-2xl">
-          Cosmoweb is a modern web interface for Filisia's Cosmo devices, enabling real-time, interactive experiences for therapy, education, and play. Connect your Cosmo devices via the Cosmoid Bridge and control them directly from your browser.
-        </p>
-        <p className="text-gray-600 text-base max-w-2xl">
-          <span className="font-semibold">How it works:</span> <br/>
-          <span className="inline-block mt-1">
-            <span className="font-medium text-purple-700">1.</span> Start the <span className="font-semibold">Cosmoid Bridge</span> app on your computer.<br/>
-            <span className="font-medium text-purple-700">2.</span> Power on your Cosmo devices and keep them nearby.<br/>
-            <span className="font-medium text-purple-700">3.</span> Devices will appear below when connected.<br/>
-            <span className="font-medium text-purple-700">4.</span> Explore games and activities from the menu!
-          </span>
-        </p>
-        <a
-          href="https://github.com/filisia/cosmowebdocs"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block mt-4 text-blue-600 hover:underline text-sm"
-        >
-          Learn more in the documentation
-        </a>
-      </div>
-    </div>
-  );
-
-  if (!wsConnected || connectionError) {
+  const BridgeStatusWidget = () => {
+    const isConnected = wsConnected && !connectionError;
+    
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8">
-        {HeroSection}
-        <div className="bg-white rounded-xl shadow-md p-8 flex flex-col items-center max-w-lg w-full">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">
-            Waiting for Cosmoid Bridge...
+      <div 
+        className="rounded-3xl border-2 shadow-xl" 
+        style={{
+          backgroundColor: '#EDDDF1', 
+          borderColor: '#7B1C93',
+          boxShadow: '10px 10px 34px 0px rgba(0, 0, 0, 0.15)',
+          padding: '24px'
+        }}
+      >
+        {/* Top section - Icon and title */}
+        <div className="flex items-center gap-2 mb-6">
+          <div className="w-8 h-8">
+            {isConnected ? (
+              // Green checkmark when connected
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="16" fill="#10B981"/>
+                <path d="M9 16l6 6L23 10" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            ) : (
+              // Spinning loader when searching
+              <svg 
+                className="animate-spin" 
+                width="32" 
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+              >
+                <defs>
+                  <linearGradient id="spinner-gradient" x1="50%" y1="0%" x2="50%" y2="100%">
+                    <stop offset="0%" stopColor="#C99BD5" stopOpacity="1" />
+                    <stop offset="100%" stopColor="#8D6198" stopOpacity="1" />
+                  </linearGradient>
+                </defs>
+                <circle 
+                  cx="16" 
+                  cy="16" 
+                  r="13.33" 
+                  stroke="url(#spinner-gradient)" 
+                  strokeWidth="3"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeDasharray="75 25"
+                />
+              </svg>
+            )}
+          </div>
+          <h2 
+            style={{
+              fontSize: '24px',
+              fontFamily: 'GT Walsheim Pro, sans-serif',
+              fontWeight: '700',
+              lineHeight: '1.24',
+              color: '#7B1C93'
+            }}
+          >
+            {isConnected ? 'Bridge App (Beta) Detected' : 'Searching Bridge App (Beta)'}
           </h2>
-          <p className="text-gray-600 text-center text-base max-w-md">
-            Cosmoweb is trying to connect to the Cosmoid Bridge on your computer.<br />
-            <span className="block mt-2">Please make sure the Cosmoid Bridge application is running.<br />
-            If you haven't installed it yet, <a href="https://drive.google.com/file/d/1QXPr67vYiePTso6lsO33KBVpTza1x6_6/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="underline text-blue-600">download it here</a>.</span>
-            <span className="block mt-2">Use a supported browser (Chrome or Edge).</span>
-            <span className="block mt-2">If the bridge is running and you still see this message, try refreshing the page.</span>
-          </p>
+        </div>
+
+        {/* Description text */}
+        <p 
+          style={{
+            fontSize: '16px',
+            fontFamily: 'GT Walsheim Pro, sans-serif',
+            fontWeight: '400',
+            lineHeight: '1.24',
+            color: 'rgba(30, 30, 30, 0.7)',
+            marginBottom: '32px',
+            maxWidth: '400px'
+          }}
+        >
+          {isConnected 
+            ? 'Here are the Cosmo devices detected by your browser. Please ensure your devices are powered on and within range.'
+            : 'Make sure the Cosmoid Bridge application is running on your computer.'}
+        </p>
+        
+        {/* White inner frame */}
+        <div 
+          className="rounded-3xl" 
+          style={{
+            backgroundColor: '#FFFFFF',
+            padding: '24px',
+            marginBottom: '24px'
+          }}
+        >
+          {/* Table headers */}
+          <div 
+            className="flex items-stretch" 
+            style={{
+              gap: '60px',
+              height: '21px',
+              marginBottom: '60px'
+            }}
+          >
+            <div 
+              style={{
+                fontSize: '18px',
+                fontFamily: 'GT Walsheim Pro, sans-serif',
+                fontWeight: '500',
+                lineHeight: '1.145',
+                color: 'rgba(30, 30, 30, 0.7)',
+                flex: '1'
+              }}
+            >
+              Serial no.
+            </div>
+            <div 
+              style={{
+                fontSize: '18px',
+                fontFamily: 'GT Walsheim Pro, sans-serif',
+                fontWeight: '500',
+                lineHeight: '1.145',
+                color: 'rgba(30, 30, 30, 0.7)',
+                flex: '1'
+              }}
+            >
+              Firmware
+            </div>
+            <div 
+              style={{
+                fontSize: '18px',
+                fontFamily: 'GT Walsheim Pro, sans-serif',
+                fontWeight: '500',
+                lineHeight: '1.145',
+                color: 'rgba(30, 30, 30, 0.7)',
+                flex: '1'
+              }}
+            >
+              Battery
+            </div>
+            <div 
+              style={{
+                fontSize: '18px',
+                fontFamily: 'GT Walsheim Pro, sans-serif',
+                fontWeight: '500',
+                lineHeight: '1.145',
+                color: 'rgba(30, 30, 30, 0.7)',
+                flex: '1'
+              }}
+            >
+              Status
+            </div>
+          </div>
+          
+          {/* Device data */}
+          {isConnected && connectedDevices.length > 0 ? (
+            connectedDevices.map((device) => (
+              <div key={device.id} className="flex items-stretch" style={{gap: '60px', marginBottom: '8px'}}>
+                <div style={{flex: '1'}}>{device.serialNumber || device.serial || 'N/A'}</div>
+                <div style={{flex: '1'}}>{device.firmwareVersion || device.firmware || 'N/A'}</div>
+                <div style={{flex: '1'}}>{device.batteryLevel !== undefined ? `${device.batteryLevel}%` : 'N/A'}</div>
+                <div style={{flex: '1'}}>{getDeviceStatus(device)}</div>
+              </div>
+            ))
+          ) : isConnected ? (
+            <div className="text-center" style={{marginTop: '40px', marginBottom: '40px'}}>
+              <p style={{
+                fontSize: '16px',
+                fontFamily: 'GT Walsheim Pro, sans-serif',
+                fontWeight: '400',
+                color: 'rgba(30, 30, 30, 0.7)'
+              }}>
+                No devices found<br/>
+                Make sure Cosmo Bridge is running and devices are in range.
+              </p>
+            </div>
+          ) : null}
+          
+          {/* Refresh message */}
+          <div 
+            className="text-center" 
+            style={{
+              marginTop: '80px',
+              maxWidth: '500px',
+              marginLeft: 'auto',
+              marginRight: 'auto'
+            }}
+          >
+            <p 
+              style={{
+                fontSize: '16px',
+                fontFamily: 'GT Walsheim Pro, sans-serif',
+                fontWeight: '300',
+                lineHeight: '1.36',
+                color: '#7B1C93',
+                textAlign: 'center'
+              }}
+            >
+              <span 
+                className="underline cursor-pointer" 
+                onClick={() => wsService.refreshConnection()}
+              >
+                Refresh Page
+              </span>
+              {" "} If the bridge is running and you still see the same status.
+              <br />
+              Use a supported browser (Chrome or Edge).
+            </p>
+          </div>
+        </div>
+        
+        {/* Launch Test Activity Button */}
+        <div className="flex justify-center">
+          <button 
+            className="flex items-center justify-center gap-2 border"
+            style={{
+              backgroundColor: '#7B1C93',
+              borderColor: '#7B1C93',
+              color: '#FFFFFF',
+              fontSize: '16px',
+              fontFamily: 'GT Walsheim Pro, sans-serif',
+              fontWeight: '400',
+              lineHeight: '1em',
+              textAlign: 'center',
+              padding: '8px 24px',
+              borderRadius: '8px',
+              height: '52px',
+              opacity: isConnected ? 1 : 0.5
+            }}
+            disabled={!isConnected}
+            onClick={isConnected ? handleLaunchTestActivity : undefined}
+          >
+            Launch Test Activity
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path 
+                d="M3.33 3.33L9.33 9.33L3.33 9.33" 
+                stroke="#FFFFFF" 
+                strokeWidth="1.6"
+                fill="none"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     );
-  }
+  };
 
   return (
-    <div className="cosmo-container">
-      {HeroSection}
-      {/* DEVICE TABLE SECTION */}
-      <div className="bg-white rounded-xl shadow p-6 mb-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-800">Connected Cosmo Devices</h2>
-            <p className="text-gray-500 text-sm mt-1">These are the Cosmo devices currently detected by your browser. Make sure your devices are powered on and nearby.</p>
-          </div>
-          <div className="flex items-center gap-3 mt-2 md:mt-0">
+    <div className="min-h-screen" style={{ backgroundColor: '#FFFFFF' }}>
+      <div className="px-20 py-12">
+        <div className="flex gap-8">
+          <div className="w-1/2">
+            {/* Cosmo Beta App Button */}
+            <div className="mb-6">
+              <button 
+                className="flex items-center justify-center gap-2"
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.15)',
+                  color: 'rgba(30, 30, 30, 0.7)',
+                  fontSize: '14px',
+                  fontFamily: 'Roboto, sans-serif',
+                  fontWeight: '500',
+                  letterSpacing: '0.714%',
+                  lineHeight: '1.43em',
+                  padding: '10px 16px',
+                  borderRadius: '100px',
+                  height: '40px',
+                  border: 'none'
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(30, 30, 30, 0.7)" strokeWidth="2">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                Cosmo Beta App
+              </button>
+            </div>
+            
+            {/* Title */}
+            <h1 className="mb-4" style={{
+              fontSize: '36px', 
+              fontFamily: 'GT Walsheim Pro, sans-serif', 
+              fontWeight: '700', 
+              lineHeight: '1.24'
+            }}>
+              <span style={{color: '#1E1E1E'}}>Welcome to the </span>
+              <span style={{color: '#7B1C93'}}>CosmoWeb</span>
+            </h1>
+            
+            <p className="mb-6 leading-relaxed" style={{
+              fontSize: '16px',
+              fontFamily: 'GT Walsheim Pro, sans-serif',
+              fontWeight: '400',
+              lineHeight: '1.24',
+              color: 'rgba(30, 30, 30, 0.7)'
+            }}>
+              CosmoWeb is a modern web interface for Filisia's Cosmo devices, providing real-time, interactive experiences for therapy, education, and play. Connect your Cosmo devices via the Cosmoid Bridge and control them directly from your browser.
+            </p>
+            
+            {/* Download buttons */}
+            <div className="flex gap-4 mb-6">
+              <button 
+                className="flex items-center justify-center gap-3 border" 
+                style={{
+                  borderColor: '#7B1C93',
+                  color: '#7B1C93',
+                  backgroundColor: '#FFFFFF',
+                  fontSize: '16px',
+                  fontFamily: 'GT Walsheim Pro, sans-serif',
+                  fontWeight: '700',
+                  borderRadius: '8px',
+                  padding: '16px 24px',
+                  width: '156px'
+                }}
+              >
+                <AppleLogo style={{ width: '14px', height: '16px' }} />
+                MacOS
+              </button>
+              <button 
+                className="flex items-center justify-center gap-3 border" 
+                style={{
+                  borderColor: '#7B1C93',
+                  color: '#7B1C93',
+                  backgroundColor: '#FFFFFF',
+                  fontSize: '16px',
+                  fontFamily: 'GT Walsheim Pro, sans-serif',
+                  fontWeight: '700',
+                  borderRadius: '8px',
+                  padding: '16px 24px',
+                  width: '156px'
+                }}
+              >
+                <WindowsLogo style={{ width: '16px', height: '16px' }} />
+                Windows
+              </button>
+            </div>
+            
+            {/* How it works section */}
+            <div className="mb-6">
+              <h3 
+                className="mb-6" 
+                style={{
+                  fontSize: '18px',
+                  fontFamily: 'GT Walsheim Pro, sans-serif',
+                  fontWeight: '500',
+                  color: '#1E1E1E',
+                  lineHeight: '1.15'
+                }}
+              >
+                How it works
+              </h3>
+              <div className="flex flex-col" style={{gap: '16px'}}>
+                {/* Step 1 */}
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#FBEAFF',
+                      border: '1px solid #7B1C93',
+                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      fontSize: '18px',
+                      fontFamily: 'GT Walsheim Pro, sans-serif',
+                      fontWeight: '500',
+                      color: '#7B1C93'
+                    }}
+                  >
+                    1
+                  </div>
+                  <div 
+                    style={{
+                      fontSize: '16px', 
+                      fontFamily: 'GT Walsheim Pro, sans-serif', 
+                      fontWeight: '400',
+                      color: 'rgba(30, 30, 30, 0.7)',
+                      lineHeight: '1.42'
+                    }}
+                  >
+                    Download and Start Cosmo Bridge App (Beta)
+                  </div>
+                </div>
+                
+                {/* Connecting line 1 */}
+                <div style={{marginLeft: '11px', width: '2px', height: '16px', backgroundColor: '#7B1C93'}} />
+                
+                {/* Step 2 */}
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#FBEAFF',
+                      border: '1px solid #7B1C93',
+                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      fontSize: '18px',
+                      fontFamily: 'GT Walsheim Pro, sans-serif',
+                      fontWeight: '500',
+                      color: '#7B1C93'
+                    }}
+                  >
+                    2
+                  </div>
+                  <div 
+                    style={{
+                      fontSize: '16px', 
+                      fontFamily: 'GT Walsheim Pro, sans-serif', 
+                      fontWeight: '400',
+                      color: 'rgba(30, 30, 30, 0.7)',
+                      lineHeight: '1.14'
+                    }}
+                  >
+                    Power on your Cosmo devices and keep them in range
+                  </div>
+                </div>
+                
+                {/* Connecting line 2 */}
+                <div style={{marginLeft: '11px', width: '2px', height: '16px', backgroundColor: '#7B1C93'}} />
+                
+                {/* Step 3 */}
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#FBEAFF',
+                      border: '1px solid #7B1C93',
+                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      fontSize: '18px',
+                      fontFamily: 'GT Walsheim Pro, sans-serif',
+                      fontWeight: '500',
+                      color: '#7B1C93'
+                    }}
+                  >
+                    3
+                  </div>
+                  <div 
+                    style={{
+                      fontSize: '16px', 
+                      fontFamily: 'GT Walsheim Pro, sans-serif', 
+                      fontWeight: '400',
+                      color: 'rgba(30, 30, 30, 0.7)',
+                      lineHeight: '1.14'
+                    }}
+                  >
+                    Devices will appear in the widget when connected
+                  </div>
+                </div>
+                
+                {/* Connecting line 3 */}
+                <div style={{marginLeft: '11px', width: '2px', height: '16px', backgroundColor: '#7B1C93'}} />
+                
+                {/* Step 4 */}
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#FBEAFF',
+                      border: '1px solid #7B1C93',
+                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      fontSize: '18px',
+                      fontFamily: 'GT Walsheim Pro, sans-serif',
+                      fontWeight: '500',
+                      color: '#7B1C93'
+                    }}
+                  >
+                    4
+                  </div>
+                  <div 
+                    style={{
+                      fontSize: '16px', 
+                      fontFamily: 'GT Walsheim Pro, sans-serif', 
+                      fontWeight: '400',
+                      color: 'rgba(30, 30, 30, 0.7)',
+                      lineHeight: '1.14'
+                    }}
+                  >
+                    Click on "Launch Test Activity " to start
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Check Documentation Button */}
             <button 
-              onClick={handleLockDevices}
-              className={`cosmo-button cosmo-lock-button ${lockState.isLocked ? 'locked' : ''}`}
-              title={lockState.isLocked ? 'Unlock all devices' : 'Lock all devices'}
+              className="flex items-center justify-center gap-2" 
+              style={{
+                border: '1px solid #7B1C93',
+                color: '#7B1C93',
+                fontSize: '16px',
+                fontFamily: 'GT Walsheim Pro, sans-serif',
+                fontWeight: '500',
+                lineHeight: '1em',
+                borderRadius: '8px',
+                padding: '8px 16px',
+                height: '52px'
+              }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <rect x="2" y="2" width="16" height="16" fill="white"/>
+                <g transform="translate(2.67, 1.33)">
+                  <path d="M0 0h10.67v13.33H0V0z" stroke="#7B1C93" strokeWidth="1.5" fill="none"/>
+                  <circle cx="6.67" cy="0" r="2" stroke="#7B1C93" strokeWidth="1.5" fill="none"/>
+                </g>
               </svg>
-              {lockState.isLocked ? 'Unlock Devices' : 'Lock Devices'}
+              Check Documentation
             </button>
           </div>
-        </div>
-        <div className="cosmo-devices-table-container">
-          <table className="cosmo-devices-table">
-            <thead>
-              <tr>
-                <th>Serial No.</th>
-                <th>Firmware</th>
-                <th>Battery</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {connectedDevices.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="cosmo-no-devices">
-                    No devices found. Make sure your Cosmo devices are powered on and nearby.
-                  </td>
-                </tr>
-              ) : (
-                connectedDevices.map((device) => (
-                  <tr key={device.id}>
-                    <td>{device.serialNumber || device.serial || 'N/A'}</td>
-                    <td>{device.firmwareVersion || device.firmware || 'N/A'}</td>
-                    <td>{device.batteryLevel !== undefined ? `${device.batteryLevel}%` : 'N/A'}</td>
-                    <td>
-                      <span className={getStatusClass(device)}>
-                        {getDeviceStatus(device)}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+          <div className="w-1/2">
+            <BridgeStatusWidget />
+          </div>
         </div>
       </div>
     </div>

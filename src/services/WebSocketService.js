@@ -17,8 +17,9 @@ class WebSocketService {
     this.url = config.wsUrl;
     this.connectedDevices = [];
     this.connectionState = false;
-    this.maxReconnectAttempts = 5;
+    this.maxReconnectAttempts = Infinity; // Keep trying indefinitely
     this.reconnectDelay = 1000;
+    this.maxReconnectDelay = 10000; // Cap at 10 seconds
     console.log('[WebSocketService] Initialized with URL:', this.url);
     
     // Auto-connect on initialization
@@ -80,7 +81,7 @@ class WebSocketService {
         console.log('[WebSocketService] WebSocket Connected');
         this.state.connecting = false;
         this.state.connected = true;
-        this.state.reconnectAttempts = 0;
+        this.state.reconnectAttempts = 0; // Reset attempts on successful connection
         this.connectionState = true;
         this.notifyListeners({ type: 'connected' });
         this.sendMessage({ type: 'getDevices' });
@@ -97,19 +98,19 @@ class WebSocketService {
         this.connectionState = false;
         this.notifyListeners({ type: 'disconnected' });
 
-        if (this.state.shouldReconnect && this.state.reconnectAttempts < this.maxReconnectAttempts) {
+        if (this.state.shouldReconnect) {
           this.state.reconnectAttempts++;
-          const delay = Math.min(1000 * Math.pow(2, this.state.reconnectAttempts - 1), 30000);
-          console.log(`[WebSocketService] Attempting to reconnect in ${delay}ms (${this.state.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+          // Use a longer delay after several attempts, but cap it
+          const baseDelay = this.state.reconnectAttempts <= 5 
+            ? 1000 * Math.pow(2, this.state.reconnectAttempts - 1) 
+            : this.maxReconnectDelay;
+          const delay = Math.min(baseDelay, this.maxReconnectDelay);
+          console.log(`[WebSocketService] Attempting to reconnect in ${delay}ms (attempt ${this.state.reconnectAttempts})...`);
           this.reconnectTimeout = setTimeout(() => {
             this.connect();
           }, delay);
         } else {
-          console.log('[WebSocketService] Not attempting reconnect:', {
-            shouldReconnect: this.state.shouldReconnect,
-            reconnectAttempts: this.state.reconnectAttempts,
-            maxReconnectAttempts: this.maxReconnectAttempts
-          });
+          console.log('[WebSocketService] Not attempting reconnect - shouldReconnect is false');
         }
       };
 
@@ -183,12 +184,13 @@ class WebSocketService {
     }
   }
 
-  disconnect() {
+  disconnect(permanently = true) {
     console.log('[WebSocketService] Disconnect called. Current state:', {
       connecting: this.state.connecting,
       connected: this.state.connected,
       shouldReconnect: this.state.shouldReconnect,
-      hasReconnectTimeout: !!this.reconnectTimeout
+      hasReconnectTimeout: !!this.reconnectTimeout,
+      permanently
     });
 
     // Clear any polling intervals (remove if not needed anymore)
@@ -199,7 +201,11 @@ class WebSocketService {
       this.pollIntervals = null; // Clean up the map
     }
 
-    this.state.shouldReconnect = false;
+    // Only disable reconnection if this is a permanent disconnect
+    if (permanently) {
+      this.state.shouldReconnect = false;
+    }
+    
     if (this.reconnectTimeout) {
       console.log('[WebSocketService] Clearing reconnect timeout');
       clearTimeout(this.reconnectTimeout);
@@ -212,6 +218,36 @@ class WebSocketService {
     }
     this.state.connecting = false;
     this.state.connected = false;
+  }
+
+  // Method to refresh/retry connection manually
+  refreshConnection() {
+    console.log('[WebSocketService] Manual connection refresh requested');
+    // Reset reconnection attempts to start fresh
+    this.state.reconnectAttempts = 0;
+    this.state.shouldReconnect = true;
+    
+    // Clear any existing reconnect timeout
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+    
+    // Disconnect if currently connected or connecting
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+    }
+    
+    // Reset state and connect
+    this.state.connecting = false;
+    this.state.connected = false;
+    this.connectionState = false;
+    
+    // Try to connect immediately
+    setTimeout(() => {
+      this.connect();
+    }, 100);
   }
 
   async sendMessage(message) {
