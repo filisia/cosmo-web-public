@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import wsService from './services/WebSocketService';
 import { useWebSocket } from './contexts/WebSocketContext';
-import ConnectionStatus from './components/ConnectionStatus';
 import cosmoLogo from './assets/images/cosmo_logo.png';
 import { ReactComponent as AppleLogo } from './assets/icons/apple-logo.svg';
 import { ReactComponent as WindowsLogo } from './assets/icons/windows-logo.svg';
@@ -123,7 +122,7 @@ function HomePage({ colors }) {
             style={{
               gap: '60px',
               height: '21px',
-              marginBottom: '16px'
+              marginBottom: '60px'
             }}
           >
             <div 
@@ -200,39 +199,37 @@ function HomePage({ colors }) {
             </div>
           ) : null}
           
-          {/* Refresh message - only show when not connected */}
-          {!isConnected && (
-            <div 
-              className="text-center" 
+          {/* Refresh message */}
+          <div 
+            className="text-center" 
+            style={{
+              marginTop: '80px',
+              maxWidth: '500px',
+              marginLeft: 'auto',
+              marginRight: 'auto'
+            }}
+          >
+            <p 
               style={{
-                marginTop: '80px',
-                maxWidth: '500px',
-                marginLeft: 'auto',
-                marginRight: 'auto'
+                fontSize: '16px',
+                fontFamily: 'GT Walsheim Pro, sans-serif',
+                fontWeight: '300',
+                lineHeight: '1.36',
+                color: '#7B1C93',
+                textAlign: 'center'
               }}
             >
-              <p 
-                style={{
-                  fontSize: '16px',
-                  fontFamily: 'GT Walsheim Pro, sans-serif',
-                  fontWeight: '300',
-                  lineHeight: '1.36',
-                  color: '#7B1C93',
-                  textAlign: 'center'
-                }}
+              <span 
+                className="underline cursor-pointer" 
+                onClick={() => wsService.refreshConnection()}
               >
-                <span 
-                  className="underline cursor-pointer" 
-                  onClick={() => wsService.refreshConnection()}
-                >
-                  Refresh Page
-                </span>
-                {" "} If the bridge is running and you still see the same status.
-                <br />
-                Use a supported browser (Chrome or Edge).
-              </p>
-            </div>
-          )}
+                Refresh Page
+              </span>
+              {" "} If the bridge is running and you still see the same status.
+              <br />
+              Use a supported browser (Chrome or Edge).
+            </p>
+          </div>
         </div>
         
         {/* Launch Test Activity Button */}
@@ -323,8 +320,7 @@ function HomePage({ colors }) {
               CosmoWeb is a modern web interface for Filisia's Cosmo devices, providing real-time, interactive experiences for therapy, education, and play. Connect your Cosmo devices via the Cosmoid Bridge and control them directly from your browser.
             </p>
             
-            {/* Connection Status */}
-            <ConnectionStatus />
+      
             
             {/* Download buttons */}
             <div className="flex gap-4 mb-6">
