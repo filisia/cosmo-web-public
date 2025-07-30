@@ -6,17 +6,17 @@ function ConnectionStatus() {
 
   const getStatusColor = () => {
     if (wsConnected) return 'bg-green-100 text-green-800 border-green-200';
-    return 'bg-red-100 text-red-800 border-red-200';
+    return 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
   const getStatusText = () => {
     if (wsConnected) return 'Connected to Cosmo Bridge';
-    return 'Cosmo Bridge not connected';
+    return '';
   };
 
   const getStatusIcon = () => {
     if (wsConnected) return '🟢';
-    return '🔴';
+    return '';
   };
 
   const getHelpText = () => {
@@ -35,6 +35,11 @@ function ConnectionStatus() {
       </div>
     );
   };
+
+  // Only show the component when connected
+  if (!wsConnected) {
+    return null;
+  }
 
   return (
     <div className={`p-4 rounded-lg border ${getStatusColor()} mb-4`}>
