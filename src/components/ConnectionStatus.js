@@ -6,17 +6,17 @@ function ConnectionStatus() {
 
   const getStatusColor = () => {
     if (wsConnected) return 'bg-green-100 text-green-800 border-green-200';
-    return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    return 'bg-red-100 text-red-800 border-red-200';
   };
 
   const getStatusText = () => {
     if (wsConnected) return 'Connected to Cosmo Bridge';
-    return 'Searching for local Cosmo Bridge app...';
+    return 'Cosmo Bridge not connected';
   };
 
   const getStatusIcon = () => {
     if (wsConnected) return '🟢';
-    return '🟡';
+    return '🔴';
   };
 
   const getHelpText = () => {
