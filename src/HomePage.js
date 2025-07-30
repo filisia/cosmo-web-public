@@ -113,7 +113,8 @@ function HomePage({ colors }) {
           style={{
             backgroundColor: '#FFFFFF',
             padding: '24px',
-            marginBottom: '24px'
+            marginBottom: '24px',
+            minHeight: '280px'
           }}
         >
           {/* Table headers */}
@@ -308,7 +309,7 @@ function HomePage({ colors }) {
               fontWeight: '700', 
               lineHeight: '1.24'
             }}>
-              <span style={{color: '#1E1E1E'}}>Welcome to the </span>
+              <span style={{color: '#1E1E1E'}}>Welcome to the amazing </span>
               <span style={{color: '#7B1C93'}}>CosmoWeb</span>
             </h1>
             

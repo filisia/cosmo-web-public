@@ -5,8 +5,19 @@ const getWebSocketUrl = () => {
     return window.COSMO_CONFIG.wsUrl;
   }
   
-  // Always connect to localhost:8080 - works from Vercel to user's local machine
-  // Modern browsers allow HTTPS sites to connect to ws://localhost
+  // Default fallback - for development, always use ws://localhost:8080
+  // Only use wss in production with HTTPS
+  if (typeof window !== 'undefined') {
+    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    if (isProduction) {
+      // Production: try to discover the local Mac app
+      // This will attempt to connect to common local network addresses
+      return null; // Will be handled by the discovery mechanism
+    }
+    return window.location.protocol === 'https:' 
+      ? 'wss://localhost:8443' 
+      : 'ws://localhost:8080';
+  }
   return 'ws://localhost:8080';
 };
 
