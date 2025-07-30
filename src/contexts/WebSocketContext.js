@@ -78,6 +78,11 @@ export function WebSocketProvider({ children }) {
         console.log('[WebSocketContext] WebSocket disconnected');
         break;
 
+      case 'no_url_configured':
+        addLog(message.message || 'No connection URL configured', 'warning');
+        console.log('[WebSocketContext] No URL configured:', message.message);
+        break;
+
       case 'discovery_failed':
         addLog(message.message || 'No local Cosmo Bridge app found', 'error');
         console.log('[WebSocketContext] Discovery failed:', message.message);

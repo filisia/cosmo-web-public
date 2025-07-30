@@ -160,10 +160,13 @@ class WebSocketService {
       return;
     }
 
-    // If no URL is set (production mode), start discovery
+    // If no URL is set (production mode), show instructions
     if (!this.url) {
-      console.log('[WebSocketService] No URL set, starting local discovery...');
-      this.discoverLocalHosts();
+      console.log('[WebSocketService] No URL set. For Vercel deployment, use ngrok tunnel or URL parameters.');
+      this.notifyListeners({ 
+        type: 'no_url_configured', 
+        message: 'Please use ngrok tunnel or add URL parameters (?wsHost=your-ip&wsPort=8443) to connect to your local Mac app.' 
+      });
       return;
     }
 

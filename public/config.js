@@ -28,9 +28,9 @@ const getWebSocketUrl = () => {
     // Development: always use ws://localhost:8080
     return 'ws://localhost:8080';
   } else {
-    // Production: For now, return null to trigger discovery
-    // In the future, this could point to a tunnel service or relay server
-    return null; // Will be handled by the discovery mechanism
+    // Production (Vercel): Cannot connect to localhost, must use tunnel or manual config
+    // Return null to show instructions to user
+    return null;
   }
 };
 
