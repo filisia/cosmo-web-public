@@ -123,7 +123,7 @@ function HomePage({ colors }) {
             style={{
               gap: '60px',
               height: '21px',
-              marginBottom: '60px'
+              marginBottom: '16px'
             }}
           >
             <div 
