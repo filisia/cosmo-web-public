@@ -28,8 +28,8 @@ const getWebSocketUrl = () => {
     // Development: always use ws://localhost:8080
     return 'ws://localhost:8080';
   } else {
-    // Production: try to discover the local Mac app
-    // This will attempt to connect to common local network addresses
+    // Production: For now, return null to trigger discovery
+    // In the future, this could point to a tunnel service or relay server
     return null; // Will be handled by the discovery mechanism
   }
 };
