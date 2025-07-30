@@ -24,33 +24,13 @@ function ConnectionStatus() {
       return 'Your Cosmo Bridge app is connected and ready to use!';
     }
     
-    // Check if we're on a deployed site (not localhost)
-    const isDeployedSite = window.location.hostname !== 'localhost' && 
-                          window.location.hostname !== '127.0.0.1';
-    
-    if (isDeployedSite) {
-      return (
-        <div className="text-sm">
-          <p className="mb-2">To connect from this deployed site to your local Mac app:</p>
-          <ol className="list-decimal list-inside space-y-1 text-xs">
-            <li>Install ngrok: <code className="bg-gray-200 px-1 rounded">brew install ngrok</code></li>
-            <li>Run: <code className="bg-gray-200 px-1 rounded">ngrok http 8443</code></li>
-            <li>Copy the ngrok URL (e.g., abc123.ngrok.io)</li>
-            <li>Add to this URL: <code className="bg-gray-200 px-1 rounded">?wsHost=abc123.ngrok.io&wsPort=443</code></li>
-          </ol>
-          <p className="mt-2 text-xs opacity-80">
-            Alternative: Run the web app locally for automatic localhost connection
-          </p>
-        </div>
-      );
-    }
-    
     return (
       <div className="text-sm">
         <p className="mb-2">To connect to your Cosmo devices:</p>
         <ol className="list-decimal list-inside space-y-1 text-xs">
           <li>Make sure the Cosmo Bridge app is installed and running on your Mac</li>
-          <li>The app will automatically connect to localhost:8080</li>
+          <li>The web app will automatically connect to your local bridge on port 8080</li>
+          <li>If connection fails, check that the bridge app is running and not blocked by firewall</li>
         </ol>
       </div>
     );

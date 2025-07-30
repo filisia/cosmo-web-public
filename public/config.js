@@ -24,14 +24,8 @@ const getWebSocketUrl = () => {
     return isHTTPS ? `wss://${host}:${port}` : `ws://${host}:${port}`;
   }
   
-  if (isDevelopment) {
-    // Development: always use ws://localhost:8080
-    return 'ws://localhost:8080';
-  } else {
-    // Production (Vercel): Cannot connect to localhost, must use tunnel or manual config
-    // Return null to show instructions to user
-    return null;
-  }
+  // Always use localhost - works from Vercel to user's local machine
+  return 'ws://localhost:8080';
 };
 
 window.COSMO_CONFIG = {
