@@ -199,37 +199,39 @@ function HomePage({ colors }) {
             </div>
           ) : null}
           
-          {/* Refresh message */}
-          <div 
-            className="text-center" 
-            style={{
-              marginTop: '80px',
-              maxWidth: '500px',
-              marginLeft: 'auto',
-              marginRight: 'auto'
-            }}
-          >
-            <p 
+          {/* Refresh message - only show when not connected */}
+          {!isConnected && (
+            <div 
+              className="text-center" 
               style={{
-                fontSize: '16px',
-                fontFamily: 'GT Walsheim Pro, sans-serif',
-                fontWeight: '300',
-                lineHeight: '1.36',
-                color: '#7B1C93',
-                textAlign: 'center'
+                marginTop: '80px',
+                maxWidth: '500px',
+                marginLeft: 'auto',
+                marginRight: 'auto'
               }}
             >
-              <span 
-                className="underline cursor-pointer" 
-                onClick={() => wsService.refreshConnection()}
+              <p 
+                style={{
+                  fontSize: '16px',
+                  fontFamily: 'GT Walsheim Pro, sans-serif',
+                  fontWeight: '300',
+                  lineHeight: '1.36',
+                  color: '#7B1C93',
+                  textAlign: 'center'
+                }}
               >
-                Refresh Page
-              </span>
-              {" "} If the bridge is running and you still see the same status.
-              <br />
-              Use a supported browser (Chrome or Edge).
-            </p>
-          </div>
+                <span 
+                  className="underline cursor-pointer" 
+                  onClick={() => wsService.refreshConnection()}
+                >
+                  Refresh Page
+                </span>
+                {" "} If the bridge is running and you still see the same status.
+                <br />
+                Use a supported browser (Chrome or Edge).
+              </p>
+            </div>
+          )}
         </div>
         
         {/* Launch Test Activity Button */}
