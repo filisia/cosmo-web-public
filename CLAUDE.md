@@ -130,6 +130,43 @@ Cosmo BLE Device → Cosmoid Bridge (WebSocket Server) → Cosmoweb (React Clien
 - Run linter: `npm run lint`
 - Type check: `npm run type-check`
 
+## Public Repository Workflow
+
+### Repository Structure
+- **Private Development**: `/Users/abinop/code/CosmoCode/cosmo-bridge/cosmoweb/`
+- **Public Repository**: `/Users/abinop/code/CosmoCode/cosmo-web-public/`
+
+### Copying Changes to Public Repository
+When changes are ready for public release, copy files from the private development repository to the public repository:
+
+```bash
+# Copy specific component
+cp /Users/abinop/code/CosmoCode/cosmo-bridge/cosmoweb/src/components/ExerciseSettings.js /Users/abinop/code/CosmoCode/cosmo-web-public/src/components/ExerciseSettings.js
+
+# Navigate to public repository
+cd /Users/abinop/code/CosmoCode/cosmo-web-public
+
+# Stage and commit changes
+git add src/components/ExerciseSettings.js
+git commit -m "Update ExerciseSettings component with [description of changes]"
+
+# Push to public repository
+git push origin master
+```
+
+### When to Use Public Repository
+- **UI Components**: Ready-for-release React components
+- **Documentation Updates**: Public-facing documentation changes
+- **Feature Releases**: Completed and tested features
+- **Bug Fixes**: Validated fixes ready for public use
+
+### Best Practices
+1. **Test thoroughly** in private repository before copying to public
+2. **Use descriptive commit messages** explaining the changes
+3. **Copy entire files** rather than partial changes to maintain consistency
+4. **Verify file paths** match between repositories
+5. **Check git status** before and after copying to ensure all changes are captured
+
 ## Security & Lock Management
 - **Device Locking**: Exclusive access control for multi-client scenarios
 - **Session Management**: Lock/unlock with session IDs
