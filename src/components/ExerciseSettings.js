@@ -10,16 +10,16 @@ export default function ExerciseSettings() {
   
   // Duration options: [seconds, displayText]
   const durationOptions = [
-    [30, '30s'],
-    [60, '1m'],
-    [120, '2m'],
-    [-1, '∞']
+    [30, '30 s'],
+    [60, '1 min'],
+    [120, '2 min'],
+    [-1, '...']
   ];
   
   const [selectedDuration, setSelectedDuration] = useState(30);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [selectedTrackId, setSelectedTrackId] = useState('brassbeat');
-  const [backgroundVolume, setBackgroundVolume] = useState(30); // 0-100
+  const [backgroundVolume, setBackgroundVolume] = useState(25); // 0-100
 
   const handlePlay = () => {
     navigate('/exercise', { 
@@ -45,25 +45,76 @@ export default function ExerciseSettings() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-purple-50 py-8">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-xl">
+    <div className="min-h-screen flex flex-col items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
+      <div 
+        className="rounded-3xl shadow-xl p-9"
+        style={{
+          
+          borderColor: '#7B1C93',
+          border: '2px solid #7B1C93',
+          boxShadow: '10px 10px 34px 0px rgba(0, 0, 0, 0.15)'
+        }}
+      >
         <div className="flex items-center mb-4">
-          <h1 className="text-3xl font-bold tracking-wide text-gray-800">EXERCISE</h1>
+          <h1 
+            className="font-bold"
+            style={{
+              fontSize: '24px',
+              fontFamily: 'GT Walsheim Pro, sans-serif',
+              fontWeight: '700',
+              lineHeight: '1.24',
+              color: '#7B1C93'
+            }}
+          >
+            Test Activity
+          </h1>
         </div>
-        <div className="text-gray-700 text-lg mb-2">
+        
+        <div 
+          className="mb-6"
+          style={{
+            fontSize: '16px',
+            fontFamily: 'GT Walsheim Pro, sans-serif',
+            fontWeight: '400',
+            lineHeight: '1.36',
+            color: 'rgba(30, 30, 30, 0.7)',
+            maxWidth: '682px'
+          }}
+        >
           Distribute the Cosmoids across the play area and swiftly press them as they illuminate to earn points before time runs out.
         </div>
-        <div className="text-sm text-gray-500 mb-6">
-          Skills Area: Joint Attention, Reaction Time, Motor Co-ordination, Spatial Awareness
-        </div>
-        <div className="grid grid-cols-2 gap-6 mb-8">
+
+        {/* Settings Grid - First Row */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {/* Music Track */}
           <div>
-            <div className="text-xs text-gray-500 font-semibold mb-1">MUSIC TRACK</div>
+            <div 
+              className="mb-2"
+              style={{
+                fontSize: '16px',
+                fontFamily: 'GT Walsheim Pro, sans-serif',
+                fontWeight: '600',
+                lineHeight: '1.4',
+                color: '#1E1E1E'
+              }}
+            >
+              Music Track
+            </div>
             <div className="relative">
               <select
                 value={selectedTrackId}
                 onChange={(e) => setSelectedTrackId(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-base font-medium appearance-none cursor-pointer hover:bg-gray-100 transition-colors"
+                className="w-full bg-white border appearance-none cursor-pointer transition-colors"
+                style={{
+                  borderColor: '#D9D9D9',
+                  borderWidth: '1px',
+                  borderRadius: '8px',
+                  padding: '12px 16px',
+                  fontSize: '14px',
+                  fontFamily: 'GT Walsheim Pro, sans-serif',
+                  fontWeight: '600',
+                  color: '#1E1E1E'
+                }}
               >
                 {BACKGROUND_TRACKS.map(track => (
                   <option key={track.id} value={track.id}>
@@ -72,87 +123,276 @@ export default function ExerciseSettings() {
                 ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M4 6L8 10L12 6" stroke="#1E1E1E" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
             </div>
           </div>
+
+          {/* Duration of Activity */}
           <div>
-            <div className="text-xs text-gray-500 font-semibold mb-1">DURATION OF GAME</div>
-            <div className="flex gap-2 mt-1">
+            <div 
+              className="mb-2"
+              style={{
+                fontSize: '16px',
+                fontFamily: 'GT Walsheim Pro, sans-serif',
+                fontWeight: '500',
+                lineHeight: '1.4',
+                color: '#1E1E1E'
+              }}
+            >
+              Duration of Activity
+            </div>
+            <div className="flex gap-2">
               {durationOptions.map(([seconds, displayText]) => (
                 <div
                   key={seconds}
                   onClick={() => setSelectedDuration(seconds)}
-                  className={`w-12 h-9 flex items-center justify-center rounded-lg border-2 text-sm font-bold select-none transition-all cursor-pointer ${
-                    selectedDuration === seconds 
-                      ? 'border-purple-500 bg-purple-100 text-purple-700' 
-                      : 'border-gray-300 bg-white text-gray-600 hover:border-purple-300'
-                  }`}
+                  className="flex-1 flex items-center justify-center cursor-pointer select-none transition-all"
+                  style={{
+                    height: '36px',
+                    borderRadius: '8px',
+                    border: selectedDuration === seconds ? '1px solid #7B1C93' : '1px solid #D9D9D9',
+                    backgroundColor: '#FFFFFF',
+                    color: selectedDuration === seconds ? '#1E1E1E' : '#757575',
+                    fontSize: '14px',
+                    fontFamily: 'GT Walsheim Pro, sans-serif',
+                    fontWeight: '600',
+                    padding: '8px'
+                  }}
                 >
                   {displayText}
                 </div>
               ))}
             </div>
-            <div className="text-xs text-gray-500 mt-1">
-              {formatDuration(selectedDuration)}
+          </div>
+        </div>
+
+        {/* Settings Grid - Second Row */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          {/* Number of Cosmoids */}
+          <div>
+            <div 
+              className="mb-2"
+              style={{
+                fontSize: '16px',
+                fontFamily: 'GT Walsheim Pro, sans-serif',
+                fontWeight: '500',
+                lineHeight: '1.4',
+                color: '#1E1E1E'
+              }}
+            >
+              Number of Cosmoids
+            </div>
+            <div className="flex gap-2">
+              {[1,2,3,4,5,6].map(i => {
+                const isConnected = i <= numCosmos;
+                const isFirst = i === 1;
+                const isSecond = i === 2;
+                
+                let bgColor, borderColor, textColor;
+                if (isFirst && isConnected) {
+                  bgColor = '#E7F2FF';
+                  borderColor = '#3172DD';
+                  textColor = '#3172DD';
+                } else if (isSecond && isConnected) {
+                  bgColor = '#FFF1F1';
+                  borderColor = '#F9502C';
+                  textColor = '#F9502C';
+                } else if (isConnected) {
+                  bgColor = '#FFFFFF';
+                  borderColor = '#757575';
+                  textColor = '#757575';
+                } else {
+                  bgColor = '#FFFFFF';
+                  borderColor = '#757575';
+                  textColor = '#757575';
+                }
+                
+                return (
+                  <div
+                    key={i}
+                    className="flex items-center justify-center rounded-full text-sm font-medium select-none transition-all"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      backgroundColor: bgColor,
+                      border: `1px solid ${borderColor}`,
+                      color: textColor,
+                      fontSize: '14px',
+                      fontFamily: 'GT Walsheim Pro, sans-serif',
+                      fontWeight: '500'
+                    }}
+                  >
+                    {i}
+                  </div>
+                );
+              })}
             </div>
           </div>
+
+          {/* Sound Toggle */}
           <div>
-            <div className="text-xs text-gray-500 font-semibold mb-1">NUMBER OF COSMOIDS</div>
-            <div className="flex gap-2 mt-1">
-              {[1,2,3,4,5,6].map(i => (
-                <div
-                  key={i}
-                  className={`w-9 h-9 flex items-center justify-center rounded-full border-2 text-lg font-bold select-none transition-all ${i <= numCosmos ? 'border-purple-500 bg-purple-100 text-purple-700' : 'border-gray-300 bg-white text-gray-300'}`}
-                >
-                  {i}
-                </div>
-              ))}
+            <div 
+              className="mb-2"
+              style={{
+                fontSize: '16px',
+                fontFamily: 'GT Walsheim Pro, sans-serif',
+                fontWeight: '500',
+                lineHeight: '1.4',
+                color: '#1E1E1E'
+              }}
+            >
+              Sound
             </div>
-          </div>
-          <div>
-            <div className="text-xs text-gray-500 font-semibold mb-1">SOUND</div>
             <div 
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="flex items-center h-9 pl-1 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
+              className="cursor-pointer transition-all"
+              style={{
+                width: '80px',
+                height: '40px',
+                backgroundColor: '#65027E',
+                borderRadius: '100px',
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center'
+              }}
             >
-              {soundEnabled ? (
-                <span className="text-2xl text-green-600">🔊</span>
-              ) : (
-                <span className="text-2xl text-gray-400">🔇</span>
-              )}
+              <div
+                className="transition-all duration-300 ease-in-out flex items-center justify-center"
+                style={{
+                  width: '39px',
+                  height: '28px',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '100px',
+                  position: 'absolute',
+                  left: soundEnabled ? '35px' : '6px',
+                  top: '6px',
+                  boxShadow: '0px 6px 13px 0px rgba(0, 0, 0, 0.12), 0px 0.5px 4px 0px rgba(0, 0, 0, 0.12)'
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M8.25 3.375L5.0625 6H2.25V12H5.0625L8.25 14.625V3.375Z" stroke="#14142B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  {soundEnabled && (
+                    <>
+                      <path d="M11.25 6.75C11.8973 7.39731 12.2676 8.28065 12.2676 9.1875C12.2676 10.0944 11.8973 10.9777 11.25 11.625" stroke="#14142B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M13.5 4.5C14.7942 5.79417 15.5208 7.54167 15.5208 9.375C15.5208 11.2083 14.7942 12.9558 13.5 14.25" stroke="#14142B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </>
+                  )}
+                </svg>
+              </div>
             </div>
           </div>
-          <div>
-            <div className="text-xs text-gray-500 font-semibold mb-1">BACKGROUND VOLUME</div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm">🔈</span>
+        </div>
+
+        {/* Background Volume - Constrained Width */}
+        <div className="mb-8" style={{ width: '335px' }}>
+          <div 
+            className="mb-2"
+            style={{
+              fontSize: '16px',
+              fontFamily: 'GT Walsheim Pro, sans-serif',
+              fontWeight: '500',
+              lineHeight: '1.4',
+              color: '#1E1E1E'
+            }}
+          >
+            Background Volume
+          </div>
+          <div className="flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M8.25 3.375L5.0625 6H2.25V12H5.0625L8.25 14.625V3.375Z" stroke="#14142B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <div className="flex-1" style={{ position: 'relative', height: '24px' }}>
+              <div 
+                style={{
+                  position: 'absolute',
+                  top: '9px',
+                  left: '0',
+                  right: '0',
+                  height: '6px',
+                  backgroundColor: 'rgba(120, 120, 120, 0.2)',
+                  borderRadius: '3px'
+                }}
+              />
+              <div 
+                style={{
+                  position: 'absolute',
+                  top: '9px',
+                  left: '0',
+                  width: `${(backgroundVolume / 100) * 100}%`,
+                  height: '6px',
+                  backgroundColor: '#65027E',
+                  borderRadius: '3px'
+                }}
+              />
               <input
                 type="range"
                 min="0"
                 max="100"
                 value={backgroundVolume}
                 onChange={(e) => setBackgroundVolume(parseInt(e.target.value))}
-                className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
-              <span className="text-sm w-8 text-right">{backgroundVolume}%</span>
+              <div 
+                className="absolute flex items-center justify-center"
+                style={{
+                  left: `calc(${(backgroundVolume / 100) * 100}% - 19px)`,
+                  top: '0',
+                  width: '38px',
+                  height: '24px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #65027E',
+                  borderRadius: '100px',
+                  boxShadow: '0px 6px 13px 0px rgba(0, 0, 0, 0.12), 0px 0.5px 4px 0px rgba(0, 0, 0, 0.12)',
+                  fontSize: '12px',
+                  fontFamily: 'GT Walsheim Pro, sans-serif',
+                  fontWeight: '500',
+                  color: '#1E1E1E'
+                }}
+              >
+                {backgroundVolume}%
+              </div>
             </div>
           </div>
         </div>
-        <div className="flex justify-center gap-8 mt-8">
-          <button
-            onClick={handlePlay}
-            className="bg-green-500 hover:bg-green-600 text-white text-lg font-bold rounded-full px-10 py-3 shadow-md transition"
-          >
-            PLAY
-          </button>
+
+        {/* Buttons */}
+        <div className="flex justify-center gap-3 mt-12">
           <button
             onClick={handleHelp}
-            className="bg-white border-2 border-gray-200 hover:border-purple-400 text-gray-700 text-lg font-bold rounded-full px-10 py-3 transition"
+            className="flex items-center justify-center transition-all"
+            style={{
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #7B1C93',
+              borderRadius: '8px',
+              padding: '16px 24px',
+              fontSize: '16px',
+              fontFamily: 'GT Walsheim Pro, sans-serif',
+              fontWeight: '700',
+              color: '#7B1C93',
+              minWidth: '156px'
+            }}
           >
-            HELP
+            Help
+          </button>
+          <button
+            onClick={handlePlay}
+            className="flex items-center justify-center transition-all"
+            style={{
+              backgroundColor: '#7B1C93',
+              border: '1px solid #7B1C93',
+              borderRadius: '8px',
+              padding: '16px 24px',
+              fontSize: '16px',
+              fontFamily: 'GT Walsheim Pro, sans-serif',
+              fontWeight: '700',
+              color: '#FFFFFF',
+              minWidth: '156px'
+            }}
+          >
+            Play
           </button>
         </div>
       </div>
