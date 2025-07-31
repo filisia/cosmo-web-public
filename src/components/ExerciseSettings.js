@@ -45,7 +45,7 @@ export default function ExerciseSettings() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
+    <div className="min-h-screen flex flex-col items-center justify-start pt-20" style={{ backgroundColor: '#FFFFFF' }}>
       <div 
         className="rounded-3xl shadow-xl p-9"
         style={{
