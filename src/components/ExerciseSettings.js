@@ -186,29 +186,20 @@ export default function ExerciseSettings() {
               Number of Cosmoids
             </div>
             <div className="flex gap-2">
-              {[1,2,3,4,5,6].map(i => {
-                const isConnected = i <= numCosmos;
-                const isFirst = i === 1;
-                const isSecond = i === 2;
+              {Array.from({ length: 6 }, (_, index) => {
+                const i = index + 1;
+                const isEnabled = index < numCosmos;
+                const colors = [
+                  { bg: '#E3F2FD', border: '#2196F3', text: '#2196F3' }, // blue
+                  { bg: '#E8F5E8', border: '#4CAF50', text: '#4CAF50' }, // green
+                  { bg: '#FFF9E1', border: '#FFC107', text: '#FFC107' }, // yellow
+                  { bg: '#FFF3E0', border: '#FF9800', text: '#FF9800' }, // orange
+                  { bg: '#FFEBEE', border: '#F44336', text: '#F44336' }, // red
+                  { bg: '#F3E5F5', border: '#9C27B0', text: '#9C27B0' }  // purple
+                ];
                 
-                let bgColor, borderColor, textColor;
-                if (isFirst && isConnected) {
-                  bgColor = '#E7F2FF';
-                  borderColor = '#3172DD';
-                  textColor = '#3172DD';
-                } else if (isSecond && isConnected) {
-                  bgColor = '#FFF1F1';
-                  borderColor = '#F9502C';
-                  textColor = '#F9502C';
-                } else if (isConnected) {
-                  bgColor = '#FFFFFF';
-                  borderColor = '#757575';
-                  textColor = '#757575';
-                } else {
-                  bgColor = '#FFFFFF';
-                  borderColor = '#757575';
-                  textColor = '#757575';
-                }
+                const colorIndex = index % colors.length;
+                const { bg, border, text } = colors[colorIndex];
                 
                 return (
                   <div
@@ -217,12 +208,13 @@ export default function ExerciseSettings() {
                     style={{
                       width: '40px',
                       height: '40px',
-                      backgroundColor: bgColor,
-                      border: `1px solid ${borderColor}`,
-                      color: textColor,
+                      backgroundColor: isEnabled ? bg : '#F5F5F5',
+                      border: `1px solid ${isEnabled ? border : '#D9D9D9'}`,
+                      color: isEnabled ? text : '#9E9E9E',
                       fontSize: '14px',
                       fontFamily: 'GT Walsheim Pro, sans-serif',
-                      fontWeight: '500'
+                      fontWeight: '500',
+                      opacity: isEnabled ? 1 : 0.5
                     }}
                   >
                     {i}
@@ -252,7 +244,7 @@ export default function ExerciseSettings() {
               style={{
                 width: '80px',
                 height: '40px',
-                backgroundColor: '#65027E',
+                backgroundColor: soundEnabled ? '#65027E' : '#E4E4E4',
                 borderRadius: '100px',
                 position: 'relative',
                 display: 'flex',
@@ -272,15 +264,17 @@ export default function ExerciseSettings() {
                   boxShadow: '0px 6px 13px 0px rgba(0, 0, 0, 0.12), 0px 0.5px 4px 0px rgba(0, 0, 0, 0.12)'
                 }}
               >
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                  <path d="M8.25 3.375L5.0625 6H2.25V12H5.0625L8.25 14.625V3.375Z" stroke="#14142B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  {soundEnabled && (
-                    <>
-                      <path d="M11.25 6.75C11.8973 7.39731 12.2676 8.28065 12.2676 9.1875C12.2676 10.0944 11.8973 10.9777 11.25 11.625" stroke="#14142B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M13.5 4.5C14.7942 5.79417 15.5208 7.54167 15.5208 9.375C15.5208 11.2083 14.7942 12.9558 13.5 14.25" stroke="#14142B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </>
-                  )}
-                </svg>
+                {soundEnabled ? (
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path d="M8.25 3.375L5.0625 6H2.25V12H5.0625L8.25 14.625V3.375Z" stroke="#14142B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M11.25 6.75C11.8973 7.39731 12.2676 8.28065 12.2676 9.1875C12.2676 10.0944 11.8973 10.9777 11.25 11.625" stroke="#14142B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M13.5 4.5C14.7942 5.79417 15.5208 7.54167 15.5208 9.375C15.5208 11.2083 14.7942 12.9558 13.5 14.25" stroke="#14142B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 19 18" fill="none">
+                    <path d="M11.5 6.75L16.273 11.523M11.5 11.523L16.273 6.75004M1 6.75V11.25H4L7.75 14.25V3.75L4 6.75H1Z" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
               </div>
             </div>
           </div>
@@ -298,7 +292,7 @@ export default function ExerciseSettings() {
               color: '#1E1E1E'
             }}
           >
-            Background Volume
+            Track volume
           </div>
           <div className="flex items-center gap-3">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
