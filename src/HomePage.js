@@ -191,8 +191,7 @@ function HomePage({ colors }) {
               <p style={{
                 fontSize: '16px',
                 fontFamily: 'GT Walsheim Pro, sans-serif',
-                fontWeight: '400',
-                color: 'rgba(30, 30, 30, 0.7)'
+                fontWeight: '400'
               }}>
                 No devices found<br/><br/>
                 If the Cosmo Bridge app is running but the Cosmo buttons don’t appear here, <span className="underline cursor-pointer" style={{ color: '#7B1C93' }} onClick={() => window.location.reload()}>refresh the page</span>. Make sure to use a supported browser (Chrome or Edge).
@@ -217,12 +216,11 @@ function HomePage({ colors }) {
                   fontFamily: 'GT Walsheim Pro, sans-serif',
                   fontWeight: '300',
                   lineHeight: '1.36',
-                  color: '#7B1C93',
                   textAlign: 'center'
                 }}
               >
                 
-                If the Cosmo Bridge app is running but the Cosmo buttons don’t appear here, <span className="underline cursor-pointer" style={{ color: '#7B1C93' }} onClick={() => window.location.reload()}>refresh the page</span>. Make sure to use a supported browser (Chrome or Edge).
+                If the Cosmo Bridge app is running but the Cosmo buttons don’t appear here, <span className="underline cursor-pointer" style={{ color: '#7B1C93' }} onClick={() => window.location.reload()}>refresh the page</span>. <br></br><br></br>Make sure to use a supported browser (Chrome or Edge).
               </p>
             </div>
           )}
