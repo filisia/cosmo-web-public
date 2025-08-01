@@ -86,7 +86,7 @@ function HomePage({ colors }) {
               color: '#7B1C93'
             }}
           >
-            {isConnected ? 'Bridge App (Beta) Detected' : 'Searching Bridge App (Beta)'}
+            {isConnected ? 'Cosmo Bridge app is running' : 'Searching Bridge App (Beta)'}
           </h2>
         </div>
 
@@ -194,8 +194,8 @@ function HomePage({ colors }) {
                 fontWeight: '400',
                 color: 'rgba(30, 30, 30, 0.7)'
               }}>
-                No devices found<br/>
-                Make sure Cosmo Bridge is running and devices are in range.
+                No devices found<br/><br/>
+                If the Cosmo Bridge app is running but the Cosmo buttons don’t appear here, <span className="underline cursor-pointer" style={{ color: '#7B1C93' }} onClick={() => window.location.reload()}>refresh the page</span>. Make sure to use a supported browser (Chrome or Edge).
               </p>
             </div>
           ) : null}
@@ -221,15 +221,8 @@ function HomePage({ colors }) {
                   textAlign: 'center'
                 }}
               >
-                <span 
-                  className="underline cursor-pointer" 
-                  onClick={() => wsService.refreshConnection()}
-                >
-                  Refresh Page
-                </span>
-                {" "} If the bridge is running and you still see the same status.
-                <br />
-                Use a supported browser (Chrome or Edge).
+                
+                If the Cosmo Bridge app is running but the Cosmo buttons don’t appear here, <span className="underline cursor-pointer" style={{ color: '#7B1C93' }} onClick={() => window.location.reload()}>refresh the page</span>. Make sure to use a supported browser (Chrome or Edge).
               </p>
             </div>
           )}
@@ -320,7 +313,7 @@ function HomePage({ colors }) {
               lineHeight: '1.24',
               color: 'rgba(30, 30, 30, 0.7)'
             }}>
-              CosmoWeb is a modern web interface for Filisia's Cosmo devices, providing real-time, interactive experiences for therapy, education, and play. Connect your Cosmo devices via the Cosmoid Bridge and control them directly from your browser.
+              CosmoWeb is a modern web interface for Filisia's Cosmo devices, providing real-time, interactive experiences for therapy, education, and play. Connect your Cosmo devices via the Cosmo Bridge and control them directly from your browser.
             </p>
             
       
@@ -375,7 +368,7 @@ function HomePage({ colors }) {
                   lineHeight: '1.15'
                 }}
               >
-                How it works
+                How it works:
               </h3>
               <div className="flex flex-col" style={{gap: '16px'}}>
                 {/* Step 1 */}
@@ -405,7 +398,7 @@ function HomePage({ colors }) {
                       lineHeight: '1.42'
                     }}
                   >
-                    Download and Start Cosmo Bridge App (Beta)
+                    Download and start Cosmo Bridge app (Beta)
                   </div>
                 </div>
                 
@@ -473,7 +466,7 @@ function HomePage({ colors }) {
                       lineHeight: '1.14'
                     }}
                   >
-                    Devices will appear in the widget when connected
+                    Your devices will appear in the widget when connected
                   </div>
                 </div>
                 
@@ -507,7 +500,7 @@ function HomePage({ colors }) {
                       lineHeight: '1.14'
                     }}
                   >
-                    Click on "Launch Test Activity " to start
+                    Click on "Launch Test Activity" to start
                   </div>
                 </div>
               </div>
