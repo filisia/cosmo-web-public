@@ -162,7 +162,13 @@ export default function ExerciseSettings() {
                     padding: '8px'
                   }}
                 >
-                  {displayText}
+                  {seconds === -1 ? (
+                    <svg width="18" height="10" viewBox="0 0 18 10" fill="none">
+                      <path d="M4.5 1C2.567 1 1 2.567 1 4.5C1 6.433 2.567 8 4.5 8C6.433 8 8 6.433 8 4.5C8 2.567 6.433 1 4.5 1ZM4.5 1C6.433 1 8 2.567 8 4.5C8 6.433 9.567 8 11.5 8C13.433 8 15 6.433 15 4.5C15 2.567 13.433 1 11.5 1C9.567 1 8 2.567 8 4.5Z" stroke={selectedDuration === seconds ? '#1E1E1E' : '#757575'} strokeWidth="1.5" fill="none"/>
+                    </svg>
+                  ) : (
+                    displayText
+                  )}
                 </div>
               ))}
             </div>
@@ -295,9 +301,15 @@ export default function ExerciseSettings() {
             Track volume
           </div>
           <div className="flex items-center gap-3">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M8.25 3.375L5.0625 6H2.25V12H5.0625L8.25 14.625V3.375Z" stroke="#14142B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            {backgroundVolume === 0 ? (
+              <svg width="18" height="18" viewBox="0 0 19 18" fill="none">
+                <path d="M11.5 6.75L16.273 11.523M11.5 11.523L16.273 6.75004M1 6.75V11.25H4L7.75 14.25V3.75L4 6.75H1Z" stroke="#14142B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M8.25 3.375L5.0625 6H2.25V12H5.0625L8.25 14.625V3.375Z" stroke="#14142B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
             <div className="flex-1" style={{ position: 'relative', height: '24px' }}>
               <div 
                 style={{
@@ -332,7 +344,7 @@ export default function ExerciseSettings() {
               <div 
                 className="absolute flex items-center justify-center"
                 style={{
-                  left: `calc(${(backgroundVolume / 100) * 100}% - 19px)`,
+                  left: `calc(${Math.max(10, (backgroundVolume / 100) * 100)}% - 19px)`,
                   top: '0',
                   width: '38px',
                   height: '24px',
