@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmo Bridge Developer Documentation</title>
+    <link rel="stylesheet" href="documentation.css">
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="container">
+        <!-- Sidebar with TOC -->
+        <div class="sidebar">
+            <!-- Back Button -->
+            <a href="/" class="back-button">Back to Cosmo Bridge</a>
+            
+            <!-- Table of Contents -->
+            <div class="toc">
+                <h2>📋 Table of Contents</h2>
+                <ul>
+                    <li><a href="#overview">1. Overview & Live Demo</a></li>
+                    <li><a href="#bridge-applications">2. Bridge Applications</a></li>
+                    <li><a href="#websocket-api-reference">3. WebSocket API Reference</a></li>
+                    <li><a href="#web-development-guide">4. Web Development Guide</a></li>
+                    <li><a href="#installation-deployment">5. Installation & Deployment</a></li>
+                    <li><a href="#code-samples">6. Code Samples</a></li>
+                    <li><a href="#troubleshooting">7. Troubleshooting</a></li>
+                    <li><a href="#getting-started-checklist">8. Getting Started Checklist</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1>
+                    <span class="cosmo-icon"></span>
+                    <span class="cosmo-icon"></span>
+                    Cosmo Bridge Developer Documentation
+                    <span class="cosmo-icon"></span>
+                    <span class="cosmo-icon"></span>
+                </h1>
+                <div class="subtitle">Complete Integration Guide for Web Applications</div>
+                <div class="version-info">
+                    <span><strong>Version:</strong> 1.0</span>
+                    <span><strong>Date:</strong> September 2025</span>
+                    <span><strong>Platform:</strong> Cosmo Bridge Ecosystem</span>
+                </div>
+            </div>
+
+        <!-- Overview -->
+        <h1 id="overview">🎯 Overview & Live Demo</h1>
+        
+        <p>The Cosmo Bridge ecosystem enables web applications to interact with Cosmo BLE devices through a WebSocket bridge application. This documentation provides developers with everything needed to build interactive applications and games that interface with Cosmo devices.</p>
+
+        <div class="architecture">
+            <div class="architecture-box">Web Applications<br/>(Your App)</div>
+            <span class="architecture-arrow">←→</span>
+            <div class="architecture-box">Bridge App<br/>(Win/Mac)</div>
+            <span class="architecture-arrow">←→</span>
+            <div class="architecture-box">Cosmo Devices<br/>(Hardware)</div>
+            <br/>
+            <div style="margin-top: 8px; color: var(--cosmo-blue);">
+                WebSocket: ws://localhost:8080 &nbsp;&nbsp;&nbsp; BLE Communication
+            </div>
+        </div>
+
+        <div class="benefits">
+            <h3>🚀 Key Benefits</h3>
+            <ul>
+                <li><strong>Cross-platform:</strong> Works on Windows and Mac</li>
+                <li><strong>Real-time communication:</strong> &lt;50ms button response time</li>
+                <li><strong>Multi-device support:</strong> Handle multiple Cosmo devices simultaneously</li>
+                <li><strong>Web-based games:</strong> Deploy games via web browsers</li>
+                <li><strong>Production ready:</strong> Extensively tested and validated</li>
+            </ul>
+        </div>
+
+        <!-- Live Demo Section -->
+        <div class="success-box">
+            <h3>🌐 Live Demo Available</h3>
+            <p>Experience the Cosmo Bridge web application in action at:</p>
+            <p style="text-align: center; margin: 15px 0;">
+                <a href="https://cosmo-bridge.vercel.app/" target="_blank" 
+                   style="color: var(--cosmo-purple); font-weight: 600; font-size: 16px; text-decoration: none; 
+                          background: white; padding: 10px 20px; border-radius: 8px; border: 2px solid var(--cosmo-purple);">
+                    https://cosmo-bridge.vercel.app/
+                </a>
+            </p>
+            
+            <h4>🏠 Main Application Features:</h4>
+            <ul>
+                <li><strong>Bridge Connection Status:</strong> Real-time WebSocket connection indicator</li>
+                <li><strong>Device Discovery:</strong> Automatic detection of nearby Cosmo devices</li>
+                <li><strong>Device Management:</strong> View serial numbers, firmware versions, battery levels, and connection status</li>
+                <li><strong>Platform Support:</strong> Download links for Windows and Mac bridge installers</li>
+                <li><strong>Test Activity Launcher:</strong> Quick access to interactive exercise games</li>
+            </ul>
+            
+            <h4>🎮 Exercise Settings & Test Activity:</h4>
+            <p>Try the interactive test activity at: <a href="https://cosmo-bridge.vercel.app/exercise-settings" target="_blank" style="color: var(--cosmo-purple); font-weight: 500;">https://cosmo-bridge.vercel.app/exercise-settings</a></p>
+            
+            <p><strong>Test Activity Features:</strong></p>
+            <ul>
+                <li><strong>Game Description:</strong> "Distribute the Cosmoids across the play area and swiftly press them as they illuminate to earn points before time runs out"</li>
+                <li><strong>Duration Settings:</strong> Choose from 30 seconds, 1 minute, 2 minutes, or infinite play time</li>
+                <li><strong>Music Options:</strong> Multiple background tracks including BrassBeat, Chill, and Upbeat styles</li>
+                <li><strong>Audio Controls:</strong> Volume slider (0-100%) with visual mute indicator</li>
+                <li><strong>Sound Toggle:</strong> Enable/disable sound effects with visual feedback</li>
+                <li><strong>Device Indicators:</strong> Shows 6 cosmoid circles representing connected devices</li>
+                <li><strong>Ready-to-Play:</strong> Launches interactive exercise when bridge and devices are connected</li>
+            </ul>
+            
+            <div class="warning-box" style="margin-top: 15px;">
+                <h4>📝 Note for Testing</h4>
+                <p>To fully experience the interactive features, you'll need:</p>
+                <ul>
+                    <li>The Cosmo Bridge application installed and running locally</li>
+                    <li>One or more Cosmo devices powered on and connected</li>
+                    <li>A modern web browser (Chrome or Edge recommended)</li>
+                </ul>
+                <p><strong>Without the bridge:</strong> The web application will show "Bridge: Disconnected" and demonstrate the user interface, but interactive device features won't be available.</p>
+            </div>
+        </div>
+
+        <!-- Bridge Applications -->
+        <h1 id="bridge-applications">🖥️ Bridge Applications</h1>
+
+        <h2>Windows Bridge Application</h2>
+        
+        <div class="info-box">
+            <h4>System Requirements</h4>
+            <ul>
+                <li>Windows 10/11 with Bluetooth Low Energy support</li>
+                <li>Bluetooth adapter (built-in or USB)</li>
+                <li>Administrator privileges (required for BLE operations)</li>
+            </ul>
+        </div>
+
+        <div class="success-box">
+            <h4>📦 Installation for End Users</h4>
+            <ol class="installation-steps">
+                <li>Download <code>CosmoBridge-Windows-Setup.exe</code> installer</li>
+                <li>Right-click installer and select "Run as Administrator"</li>
+                <li>Follow the installation wizard</li>
+                <li>Grant Bluetooth permissions when prompted</li>
+                <li>Launch "Cosmo Bridge" from the Start Menu or Desktop</li>
+            </ol>
+        </div>
+
+        <h2>Mac Bridge Application</h2>
+        
+        <div class="info-box">
+            <h4>System Requirements</h4>
+            <ul>
+                <li>macOS 10.15 (Catalina) or newer</li>
+                <li>Built-in Bluetooth or compatible Bluetooth adapter</li>
+                <li>Bluetooth permissions for the application</li>
+            </ul>
+        </div>
+
+        <div class="success-box">
+            <h4>📦 Installation for End Users</h4>
+            <ol class="installation-steps">
+                <li>Download <code>CosmoBridge-Mac-Setup.dmg</code> installer</li>
+                <li>Open the <code>.dmg</code> file</li>
+                <li>Drag "Cosmo Bridge" to the Applications folder</li>
+                <li>Launch from Applications folder</li>
+                <li>Grant Bluetooth permissions in System Preferences when prompted</li>
+            </ol>
+        </div>
+
+        <!-- WebSocket API Reference -->
+        <h1 id="websocket-api-reference">🔗 WebSocket API Reference</h1>
+
+        <div class="api-box">
+            <h4>Connection</h4>
+            <p><strong>Endpoint:</strong> <code>ws://localhost:8080</code></p>
+            <pre><code>const ws = new WebSocket('ws://localhost:8080');
+
+ws.onopen = () => {
+  console.log('Connected to Cosmo Bridge');
+  ws.send(JSON.stringify({ type: 'getDevices' }));
+};</code></pre>
+        </div>
+
+        <h2>Core Messages</h2>
+
+        <h3>Device Management</h3>
+        <div class="api-box">
+            <h4>Get All Devices</h4>
+            <p><strong>Request:</strong></p>
+            <pre><code>{ "type": "getDevices" }</code></pre>
+            <p><strong>Response:</strong></p>
+            <pre><code>{
+  "type": "devices",
+  "devices": [
+    {
+      "id": "device-uuid-string",
+      "name": "Cosmo Device",
+      "serial": "2405002009",
+      "firmware": "4.6.00",
+      "batteryLevel": 85,
+      "connected": true,
+      "buttonState": 0,
+      "pressValue": 0,
+      "color": [0, 0, 0],
+      "luminosity": 0
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <h3>Device Control</h3>
+        <div class="api-box">
+            <h4>Set Device Color</h4>
+            <pre><code>{
+  "type": "setColor",
+  "deviceId": "device-uuid-string",
+  "color": { "r": 255, "g": 0, "b": 128 }
+}</code></pre>
+            
+            <p><strong>Example Colors:</strong></p>
+            <span class="color-demo color-red"></span> Red: {r: 255, g: 0, b: 0}<br/>
+            <span class="color-demo color-green"></span> Green: {r: 0, g: 255, b: 0}<br/>
+            <span class="color-demo color-blue"></span> Blue: {r: 0, g: 0, b: 255}<br/>
+            <span class="color-demo color-yellow"></span> Yellow: {r: 255, g: 255, b: 0}<br/>
+            <span class="color-demo color-purple"></span> Purple: {r: 255, g: 0, b: 255}<br/>
+            <span class="color-demo color-cyan"></span> Cyan: {r: 0, g: 255, b: 255}
+        </div>
+
+        <h3>Button Events</h3>
+        <div class="api-box">
+            <h4>Button Press Event</h4>
+            <pre><code>{
+  "type": "buttonPress",
+  "deviceId": "device-uuid-string",
+  "pressValue": 255,
+  "timestamp": "2025-09-02T12:00:00.000Z"
+}</code></pre>
+        </div>
+
+        <div class="warning-box">
+            <h4>⚡ Performance Guidelines</h4>
+            <ul>
+                <li><strong>Rate Limiting:</strong> Maximum 10 messages/second per device</li>
+                <li><strong>Button Response:</strong> &lt;50ms from WebSocket message to UI update</li>
+                <li><strong>Multi-device:</strong> Tested with 6+ simultaneous connections</li>
+            </ul>
+        </div>
+
+        <!-- Web Development Guide -->
+        <h1 id="web-development-guide">💻 Web Development Guide</h1>
+
+        <h2>Quick Start Example</h2>
+        <div class="api-box">
+            <h4>Basic Device Manager</h4>
+            <pre><code>class CosmoDeviceManager {
+  constructor() {
+    this.devices = new Map();
+    this.ws = null;
+    this.listeners = new Set();
+  }
+  
+  connect() {
+    this.ws = new WebSocket('ws://localhost:8080');
+    
+    this.ws.onopen = () => {
+      console.log('Connected to Cosmo Bridge');
+      this.requestDevices();
+    };
+    
+    this.ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      this.handleMessage(message);
+    };
+  }
+  
+  setColor(deviceId, r, g, b) {
+    this.ws.send(JSON.stringify({
+      type: 'setColor',
+      deviceId,
+      color: { r, g, b }
+    }));
+  }
+}</code></pre>
+        </div>
+
+        <h2>Educational Game Pattern</h2>
+        <div class="api-box">
+            <h4>Simple Educational Game</h4>
+            <pre><code>class CosmoEducationalGame {
+  constructor(deviceManager) {
+    this.deviceManager = deviceManager;
+    this.score = 0;
+    this.currentTarget = null;
+    
+    // Listen for button events
+    this.deviceManager.addListener(this.handleGameEvent.bind(this));
+  }
+  
+  startGame(deviceIds) {
+    // Set colors for each device
+    const colors = [
+      { r: 255, g: 0, b: 0 },   // Red
+      { r: 0, g: 255, b: 0 },   // Green  
+      { r: 0, g: 0, b: 255 }    // Blue
+    ];
+    
+    deviceIds.forEach((deviceId, index) => {
+      const color = colors[index % colors.length];
+      this.deviceManager.setColor(deviceId, color.r, color.g, color.b);
+    });
+    
+    this.nextTarget();
+  }
+  
+  handleGameEvent(message) {
+    if (message.type === 'buttonPress' && message.deviceId === this.currentTarget) {
+      this.score++;
+      console.log('Correct! Score:', this.score);
+      this.nextTarget();
+    }
+  }
+}</code></pre>
+        </div>
+
+        <!-- Installation & Deployment -->
+        <h1 id="installation-deployment">📦 Installation & Deployment</h1>
+
+        <div class="success-box">
+            <h3>For Web Developers</h3>
+            <ul>
+                <li>No installation required - develop in any web browser</li>
+                <li>Connect to bridge via <code>ws://localhost:8080</code></li>
+                <li>Deploy web games to any hosting service (Vercel, Netlify, GitHub Pages, etc.)</li>
+                <li>End users run the bridge locally, access games from any web URL</li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <h4>📋 Distribution Model</h4>
+            <ul>
+                <li><strong>Developers distribute:</strong> Bridge installers to their customers</li>
+                <li><strong>Developers create:</strong> Web applications using provided API and examples</li>
+                <li><strong>End users install:</strong> Bridge app once, then access multiple web applications</li>
+                <li><strong>Applications hosted:</strong> Anywhere on the web, connect to local bridge automatically</li>
+            </ul>
+            
+            <h4>🌟 Live Reference Implementation</h4>
+            <p>The Cosmo Bridge web application at <a href="https://cosmo-bridge.vercel.app/" target="_blank" style="color: var(--cosmo-purple); font-weight: 500;">https://cosmo-bridge.vercel.app/</a> serves as a complete reference implementation showing:</p>
+            <ul>
+                <li><strong>Professional UI/UX design</strong> with Cosmo branding and styling</li>
+                <li><strong>Robust WebSocket integration</strong> with connection status and error handling</li>
+                <li><strong>Multi-device management</strong> displaying device information and status</li>
+                <li><strong>Interactive game implementation</strong> with settings, audio controls, and real-time feedback</li>
+            </ul>
+        </div>
+
+        <!-- Code Samples -->
+        <h1 id="code-samples">📋 Code Samples</h1>
+
+        <div class="api-box">
+            <h4>Multi-Device Light Show</h4>
+            <pre><code>class CosmoLightShow {
+  async rainbowPattern(devices, duration = 5000) {
+    const colors = [
+      [255, 0, 0], [255, 127, 0], [255, 255, 0],
+      [0, 255, 0], [0, 0, 255], [75, 0, 130]
+    ];
+    
+    const stepDuration = duration / colors.length;
+    
+    for (let i = 0; i < colors.length; i++) {
+      const [r, g, b] = colors[i];
+      devices.forEach(deviceId => {
+        this.deviceManager.setColor(deviceId, r, g, b);
+        this.deviceManager.setLuminosity(deviceId, 128);
+      });
+      
+      await new Promise(resolve => setTimeout(resolve, stepDuration));
+    }
+  }
+}</code></pre>
+        </div>
+
+        <!-- Troubleshooting -->
+        <h1 id="troubleshooting">🔧 Troubleshooting</h1>
+
+        <div class="warning-box">
+            <h4>Connection Problems</h4>
+            <p><strong>Issue:</strong> Cannot connect to WebSocket</p>
+            <p><strong>Solution:</strong></p>
+            <ul>
+                <li>Ensure bridge application is running</li>
+                <li>Check that port 8080 is not blocked by firewall</li>
+                <li>Verify WebSocket URL is <code>ws://localhost:8080</code></li>
+            </ul>
+        </div>
+
+        <div class="api-box">
+            <h4>Health Check Commands</h4>
+            <pre><code>// Check bridge connectivity
+const healthCheck = () => {
+  const ws = new WebSocket('ws://localhost:8080');
+  ws.onopen = () => {
+    console.log('✓ Bridge connection successful');
+    ws.send(JSON.stringify({ type: 'ping' }));
+  };
+  ws.onerror = () => {
+    console.log('✗ Bridge connection failed');
+  };
+};</code></pre>
+        </div>
+
+        <!-- Getting Started Checklist -->
+        <h1 id="getting-started-checklist">✅ Getting Started Checklist for Developers</h1>
+
+        <div class="checklist">
+            <h3>Step 1: Distribute Bridge to Your Users</h3>
+            <ul>
+                <li>Provide users with appropriate installer (<code>CosmoBridge-Windows-Setup.exe</code> or <code>CosmoBridge-Mac-Setup.dmg</code>)</li>
+                <li>Include installation instructions</li>
+                <li>Ensure users understand they need Administrator/Bluetooth permissions</li>
+            </ul>
+        </div>
+
+        <div class="checklist">
+            <h3>Step 2: Develop Your Web Games</h3>
+            <ul>
+                <li>Use the provided code samples as starting points</li>
+                <li>Test with bridge running locally (<code>ws://localhost:8080</code>)</li>
+                <li>Implement error handling for connection issues</li>
+                <li>Test with multiple Cosmo devices if needed</li>
+            </ul>
+        </div>
+
+        <div class="success-box">
+            <h3>Step 3: User Experience</h3>
+            <ol class="installation-steps">
+                <li><strong>User installs bridge</strong> (one-time setup)</li>
+                <li><strong>User launches bridge</strong> (starts WebSocket server)</li>
+                <li><strong>User visits your web game</strong> (any URL)</li>
+                <li><strong>Game connects automatically</strong> to local bridge</li>
+                <li><strong>User plays with Cosmo devices</strong> seamlessly</li>
+            </ol>
+            
+            <h4>🎯 Experience the Complete Flow</h4>
+            <p>See this entire user experience in action by visiting <a href="https://cosmo-bridge.vercel.app/" target="_blank" style="color: var(--cosmo-purple); font-weight: 500;">https://cosmo-bridge.vercel.app/</a> with the bridge application running. The live demo shows exactly what your users will experience when using applications built with the Cosmo Bridge ecosystem.</p>
+        </div>
+
+        </div>
+    </div>
+    
+    <script>
+        // Progress bar functionality
+        window.addEventListener('scroll', () => {
+            const scrollTop = document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (scrollTop / scrollHeight) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+            
+            // Add scrolled class to TOC for blur effect
+            const toc = document.querySelector('.toc');
+            if (scrollTop > 100) {
+                toc.classList.add('scrolled');
+            } else {
+                toc.classList.remove('scrolled');
+            }
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('.toc a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Highlight current section in TOC
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -70% 0px',
+            threshold: 0
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const id = entry.target.getAttribute('id');
+                const tocLink = document.querySelector(`.toc a[href="#${id}"]`);
+                if (tocLink) {
+                    if (entry.isIntersecting) {
+                        document.querySelectorAll('.toc a').forEach(link => {
+                            link.style.color = 'var(--cosmo-gray)';
+                            link.style.fontWeight = '500';
+                        });
+                        tocLink.style.color = 'var(--cosmo-purple)';
+                        tocLink.style.fontWeight = '700';
+                    }
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all sections
+        document.querySelectorAll('h1[id]').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
