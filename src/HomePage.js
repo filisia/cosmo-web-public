@@ -518,6 +518,7 @@ function HomePage({ colors }) {
                 padding: '8px 16px',
                 height: '52px'
               }}
+              onClick={() => window.open('/documentation.html', '_blank')}
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <rect x="2" y="2" width="16" height="16" fill="white"/>
