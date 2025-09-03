@@ -71,6 +71,20 @@ function Navigation() {
           >
             Test Activity
           </Link>
+          <a 
+            href="/documentation.html" 
+            target="_blank"
+            className="px-6 py-4 rounded-lg border text-purple-700 border-purple-700 hover:bg-purple-50"
+            style={{
+              fontSize: '16px',
+              fontFamily: 'GT Walsheim Pro, sans-serif',
+              fontWeight: '700',
+              borderColor: '#7B1C93',
+              textDecoration: 'none'
+            }}
+          >
+            Documentation
+          </a>
         </div>
       </div>
     </header>
