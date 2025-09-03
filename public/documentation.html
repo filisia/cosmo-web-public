@@ -241,7 +241,16 @@ ws.onopen = () => {
                 <div class="api-box">
                     <h4>Health Check</h4>
                     <pre><code>{ "type": "ping" }</code></pre>
-                    <small>Test bridge connection</small>
+                    <small>Test bridge connection (expect pong response)</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Request Device Scan</h4>
+                    <pre><code>{
+  "type": "requestScan",
+  "duration": 10000
+}</code></pre>
+                    <small>Scan for new devices (duration in ms)</small>
                 </div>
             </div>
             
@@ -329,6 +338,15 @@ ws.onopen = () => {
 }</code></pre>
                     <small>Error notifications</small>
                 </div>
+                
+                <div class="api-box">
+                    <h4>Ping Response</h4>
+                    <pre><code>{
+  "type": "pong",
+  "timestamp": "2025-09-03T10:30:00.000Z"
+}</code></pre>
+                    <small>Response to ping health check</small>
+                </div>
             </div>
         </div>
         
@@ -344,7 +362,7 @@ ws.onopen = () => {
             </div>
         </div>
 
-        <h2>Additional Message Types</h2>
+        <h2>Advanced Message Types</h2>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
             <div class="api-box">
@@ -359,12 +377,48 @@ ws.onopen = () => {
             </div>
             
             <div class="api-box">
-                <h4>Request Device Scan</h4>
+                <h4>Connection State Changes</h4>
                 <pre><code>{
-  "type": "requestScan",
-  "duration": 10000
+  "type": "deviceConnectionChanged",
+  "deviceId": "device-uuid",
+  "connected": true,
+  "timestamp": "2025-09-03T10:30:00.000Z"
 }</code></pre>
-                <small>Scan for new devices (duration in ms)</small>
+                <small>Device connection/disconnection events</small>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <h4>📝 Message Type Summary</h4>
+            <p><strong>All Available Message Types:</strong></p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <strong>Outgoing (Your App → Bridge):</strong>
+                    <ul style="margin: 5px 0; font-family: monospace; font-size: 13px;">
+                        <li>getDevices</li>
+                        <li>setColor</li>
+                        <li>setLuminosity</li>
+                        <li>setMode</li>
+                        <li>lockDevices</li>
+                        <li>ping</li>
+                        <li>requestScan</li>
+                    </ul>
+                </div>
+                <div>
+                    <strong>Incoming (Bridge → Your App):</strong>
+                    <ul style="margin: 5px 0; font-family: monospace; font-size: 13px;">
+                        <li>devices</li>
+                        <li>buttonPress</li>
+                        <li>buttonRelease</li>
+                        <li>buttonStateChanged</li>
+                        <li>deviceUpdate</li>
+                        <li>lockStateChanged</li>
+                        <li>error</li>
+                        <li>pong</li>
+                        <li>characteristicValueChanged</li>
+                        <li>deviceConnectionChanged</li>
+                    </ul>
+                </div>
             </div>
         </div>
         
