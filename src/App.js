@@ -73,7 +73,6 @@ function Navigation() {
           </Link>
           <a 
             href="/documentation.html" 
-            target="_blank"
             className="hidden lg:flex px-6 py-4 rounded-lg border text-purple-700 border-purple-700 hover:bg-purple-50"
             style={{
               fontSize: '16px',

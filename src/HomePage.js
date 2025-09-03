@@ -598,30 +598,30 @@ function HomePage({ colors }) {
             </div>
             
             {/* Check Documentation Button */}
-            <button 
-              className="flex items-center justify-center gap-2" 
-              style={{
-                border: '1px solid #7B1C93',
-                color: '#7B1C93',
-                fontSize: '16px',
-                fontFamily: 'GT Walsheim Pro, sans-serif',
-                fontWeight: '500',
-                lineHeight: '1em',
-                borderRadius: '8px',
-                padding: '8px 16px',
-                height: '52px'
-              }}
-              onClick={() => window.open('/documentation.html', '_blank')}
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <rect x="2" y="2" width="16" height="16" fill="white"/>
-                <g transform="translate(2.67, 1.33)">
-                  <path d="M0 0h10.67v13.33H0V0z" stroke="#7B1C93" strokeWidth="1.5" fill="none"/>
-                  <circle cx="6.67" cy="0" r="2" stroke="#7B1C93" strokeWidth="1.5" fill="none"/>
-                </g>
-              </svg>
-              Documentation
-            </button>
+              <button 
+                className="flex items-center justify-center gap-2" 
+                style={{
+                  border: '1px solid #7B1C93',
+                  color: '#7B1C93',
+                  fontSize: '16px',
+                  fontFamily: 'GT Walsheim Pro, sans-serif',
+                  fontWeight: '500',
+                  lineHeight: '1em',
+                  borderRadius: '8px',
+                  padding: '8px 16px',
+                  height: '52px'
+                }}
+                onClick={() => window.location.href = '/documentation.html'}
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <rect x="2" y="2" width="16" height="16" fill="white"/>
+                  <g transform="translate(2.67, 1.33)">
+                    <path d="M0 0h10.67v13.33H0V0z" stroke="#7B1C93" strokeWidth="1.5" fill="none"/>
+                    <circle cx="6.67" cy="0" r="2" stroke="#7B1C93" strokeWidth="1.5" fill="none"/>
+                  </g>
+                </svg>
+                Documentation
+              </button>
           </div>
           <div className="w-1/2">
             <BridgeStatusWidget />
