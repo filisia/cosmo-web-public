@@ -56,7 +56,7 @@ function Navigation() {
           </Link>
           <Link 
             to="/exercise-settings" 
-            className={`px-6 py-4 rounded-lg border ${
+            className={`hidden lg:flex px-6 py-4 rounded-lg border ${
               isActive('/exercise')
                 ? 'text-white border-purple-700'
                 : 'text-purple-700 border-purple-700 hover:bg-purple-50'

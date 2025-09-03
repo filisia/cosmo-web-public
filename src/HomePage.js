@@ -37,7 +37,7 @@ function HomePage({ colors }) {
           backgroundColor: '#EDDDF1', 
           borderColor: '#7B1C93',
           boxShadow: '10px 10px 34px 0px rgba(0, 0, 0, 0.15)',
-          padding: '24px'
+          padding: 'clamp(16px, 4vw, 24px)'
         }}
       >
         {/* Top section - Icon and title */}
@@ -79,7 +79,7 @@ function HomePage({ colors }) {
           </div>
           <h2 
             style={{
-              fontSize: '24px',
+              fontSize: 'clamp(18px, 4vw, 24px)',
               fontFamily: 'GT Walsheim Pro, sans-serif',
               fontWeight: '700',
               lineHeight: '1.24',
@@ -112,18 +112,18 @@ function HomePage({ colors }) {
           className="rounded-3xl" 
           style={{
             backgroundColor: '#FFFFFF',
-            padding: '24px',
-            marginBottom: '24px',
-            minHeight: '280px'
+            padding: 'clamp(16px, 4vw, 24px)',
+            marginBottom: 'clamp(16px, 4vw, 24px)',
+            minHeight: 'clamp(200px, 50vw, 280px)'
           }}
         >
           {/* Table headers */}
           <div 
-            className="flex items-stretch" 
+            className="hidden sm:flex items-stretch" 
             style={{
-              gap: '60px',
+              gap: 'clamp(20px, 8vw, 60px)',
               height: '21px',
-              marginBottom: '60px'
+              marginBottom: 'clamp(30px, 8vw, 60px)'
             }}
           >
             <div 
@@ -179,11 +179,23 @@ function HomePage({ colors }) {
           {/* Device data */}
           {isConnected && connectedDevices.length > 0 ? (
             connectedDevices.map((device) => (
-              <div key={device.id} className="flex items-stretch" style={{gap: '60px', marginBottom: '8px'}}>
+              <div key={device.id}>
+                {/* Desktop layout */}
+                <div className="hidden sm:flex items-stretch" style={{gap: 'clamp(20px, 8vw, 60px)', marginBottom: '8px'}}>
                 <div style={{flex: '1'}}>{device.serialNumber || device.serial || 'N/A'}</div>
                 <div style={{flex: '1'}}>{device.firmwareVersion || device.firmware || 'N/A'}</div>
                 <div style={{flex: '1'}}>{device.batteryLevel !== undefined ? `${device.batteryLevel}%` : 'N/A'}</div>
                 <div style={{flex: '1'}}>{getDeviceStatus(device)}</div>
+                </div>
+                {/* Mobile layout */}
+                <div className="sm:hidden mb-4 p-3 bg-gray-50 rounded-lg">
+                  <div className="font-semibold mb-2" style={{color: '#7B1C93'}}>Device {device.serialNumber || device.serial || 'N/A'}</div>
+                  <div className="text-sm space-y-1">
+                    <div><span className="font-medium">Firmware:</span> {device.firmwareVersion || device.firmware || 'N/A'}</div>
+                    <div><span className="font-medium">Battery:</span> {device.batteryLevel !== undefined ? `${device.batteryLevel}%` : 'N/A'}</div>
+                    <div><span className="font-medium">Status:</span> <span className={getStatusClass(device)}>{getDeviceStatus(device)}</span></div>
+                  </div>
+                </div>
               </div>
             ))
           ) : isConnected ? (
@@ -262,8 +274,83 @@ function HomePage({ colors }) {
     );
   };
 
-  return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FFFFFF' }}>
+  // Mobile-specific message component
+  const MobileMessage = () => (
+    <div className="block lg:hidden min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
+      <div className="px-6 py-8 max-w-md mx-auto text-center">
+        {/* Cosmo Logo/Icon */}
+        <div className="mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style={{ backgroundColor: '#EDDDF1' }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7B1C93" strokeWidth="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </div>
+        </div>
+
+        {/* Main Message */}
+        <h1 style={{
+          fontSize: '24px',
+          fontFamily: 'GT Walsheim Pro, sans-serif',
+          fontWeight: '700',
+          lineHeight: '1.3',
+          color: '#7B1C93',
+          marginBottom: '16px'
+        }}>
+          Desktop Experience Required
+        </h1>
+
+        <p style={{
+          fontSize: '16px',
+          fontFamily: 'GT Walsheim Pro, sans-serif',
+          fontWeight: '400',
+          lineHeight: '1.5',
+          color: 'rgba(30, 30, 30, 0.7)',
+          marginBottom: '24px'
+        }}>
+          CosmoWeb is optimized for desktop browsers to provide the best experience with your Cosmo devices.
+        </p>
+
+        <p style={{
+          fontSize: '14px',
+          fontFamily: 'GT Walsheim Pro, sans-serif',
+          fontWeight: '400',
+          lineHeight: '1.5',
+          color: 'rgba(30, 30, 30, 0.6)',
+          marginBottom: '32px'
+        }}>
+          Please open this application on a desktop or laptop computer with a larger screen resolution.
+        </p>
+
+        {/* Friendly Icon */}
+        <div className="mb-6">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#7B1C93" strokeWidth="1.5" style={{ margin: '0 auto' }}>
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
+
+        {/* Additional Info */}
+        <div className="p-4 rounded-lg" style={{ backgroundColor: '#F8F9FA', border: '1px solid #E9ECEF' }}>
+          <p style={{
+            fontSize: '13px',
+            fontFamily: 'GT Walsheim Pro, sans-serif',
+            fontWeight: '400',
+            lineHeight: '1.4',
+            color: 'rgba(30, 30, 30, 0.6)',
+            margin: '0'
+          }}>
+            For the best experience with Cosmo Bridge and device management, please use Chrome or Edge on a desktop computer.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Desktop Layout (unchanged)
+  const DesktopLayout = () => (
+    <div className="hidden lg:block min-h-screen" style={{ backgroundColor: '#FFFFFF' }}>
       <div className="px-20 py-12">
         <div className="flex gap-8">
           <div className="w-1/2">
@@ -541,6 +628,13 @@ function HomePage({ colors }) {
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <MobileMessage />
+      <DesktopLayout />
     </div>
   );
 }
