@@ -253,76 +253,128 @@ ws.onopen = () => {
         <!-- Web Development Guide -->
         <h1 id="web-development-guide">💻 Web Development Guide</h1>
 
-        <h2>Quick Start Example</h2>
+        <h2>2. Device Management & Event Handling</h2>
         <div class="api-box">
-            <h4>Basic Device Manager</h4>
-            <pre><code>class CosmoDeviceManager {
-  constructor() {
-    this.devices = new Map();
-    this.ws = null;
-    this.listeners = new Set();
+            <h4>Real Implementation from ExerciseGame.js</h4>
+            <pre><code>// Button press handling with debouncing and game logic
+const handleButtonPress = useCallback((deviceId) => {
+  // Don't process button presses if game is over
+  if (gameOver) {
+    console.log(`[ExerciseGame] ❌ Button press ignored - game is over`);
+    return;
   }
   
-  connect() {
-    this.ws = new WebSocket('ws://localhost:8080');
-    
-    this.ws.onopen = () => {
-      console.log('Connected to Cosmo Bridge');
-      this.requestDevices();
-    };
-    
-    this.ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      this.handleMessage(message);
-    };
+  if (!activeDevice || deviceId !== activeDevice.id) {
+    console.log(`[ExerciseGame] ❌ Button press ignored - deviceId mismatch`);
+    return;
   }
   
-  setColor(deviceId, r, g, b) {
-    this.ws.send(JSON.stringify({
-      type: 'setColor',
-      deviceId,
-      color: { r, g, b }
-    }));
-  }
-}</code></pre>
-        </div>
+  console.log(`[ExerciseGame] ✅ Correct button press! Score: ${score + 1}`);
+  
+  // Play MIDI note based on the current active index
+  playMIDINote(activeIndex, 100, 0.3);
+  
+  setScore(s => s + 1);
+  setActiveIndex(i => (i + 1) % cosmosToUse.length);
+}, [activeDevice, cosmosToUse, score, activeIndex, playMIDINote, gameOver]);
 
-        <h2>Educational Game Pattern</h2>
-        <div class="api-box">
-            <h4>Simple Educational Game</h4>
-            <pre><code>class CosmoEducationalGame {
-  constructor(deviceManager) {
-    this.deviceManager = deviceManager;
-    this.score = 0;
-    this.currentTarget = null;
-    
-    // Listen for button events
-    this.deviceManager.addListener(this.handleGameEvent.bind(this));
+// Button state monitoring with proper debouncing
+const checkButtonStates = useCallback(() => {
+  if (gameOver || !gameStarted || !activeDevice || !deviceValues[activeDevice.id]) {
+    return;
   }
   
-  startGame(deviceIds) {
-    // Set colors for each device
-    const colors = [
-      { r: 255, g: 0, b: 0 },   // Red
-      { r: 0, g: 255, b: 0 },   // Green  
-      { r: 0, g: 0, b: 255 }    // Blue
-    ];
-    
-    deviceIds.forEach((deviceId, index) => {
-      const color = colors[index % colors.length];
-      this.deviceManager.setColor(deviceId, color.r, color.g, color.b);
-    });
-    
-    this.nextTarget();
-  }
+  const deviceValue = deviceValues[activeDevice.id];
+  const currentButtonState = deviceValue.buttonState;
+  const previousButtonState = previousButtonStates.current[activeDevice.id];
   
-  handleGameEvent(message) {
-    if (message.type === 'buttonPress' && message.deviceId === this.currentTarget) {
-      this.score++;
-      console.log('Correct! Score:', this.score);
-      this.nextTarget();
+  const wasReleased = previousButtonState === 0;
+  const isPressed = currentButtonState === 1;
+  
+  if (wasReleased && isPressed) {
+    const now = Date.now();
+    if (!lastPressRef.current[activeDevice.id] || now - lastPressRef.current[activeDevice.id] > 500) {
+      lastPressRef.current[activeDevice.id] = now;
+      handleButtonPress(activeDevice.id);
     }
   }
+  
+  // Update previous state
+  previousButtonStates.current[activeDevice.id] = currentButtonState;
+}, [gameStarted, activeDevice, deviceValues, handleButtonPress, gameOver]);</code></pre>
+        </div>
+
+        <h2>3. React Integration Example</h2>
+        <div class="api-box">
+            <h4>Complete React Component from ExerciseGame.js</h4>
+            <pre><code>import { useWebSocket } from '../contexts/WebSocketContext';
+import wsService from '../services/WebSocketService';
+
+// Color mapping for devices
+const colorMap = [
+  { name: 'blue', rgb: [0, 0, 4] },
+  { name: 'green', rgb: [0, 4, 0] },
+  { name: 'yellow', rgb: [4, 3, 0] },
+  { name: 'orange', rgb: [4, 1, 0] },
+  { name: 'red', rgb: [4, 0, 0] },
+  { name: 'purple', rgb: [4, 0, 4] },
+];
+
+export default function ExerciseGame() {
+  const { connectedDevices, deviceValues } = useWebSocket();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [gameStarted, setGameStarted] = useState(false);
+  
+  // Get connected devices for the game
+  const cosmosToUse = useMemo(() => 
+    connectedDevices.slice(0, numCosmos), [connectedDevices, numCosmos]);
+  
+  // Initialize device colors and lighting
+  useEffect(() => {
+    if (cosmosToUse.length > 0 && !hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      cosmosToUse.forEach((device, idx) => {
+        const [r, g, b] = colorMap[idx % colorMap.length].rgb;
+        wsService.setColor(device.id, r, g, b);
+        wsService.setLuminosity(device.id, 0); // Start with zero luminosity
+      });
+      setGameStarted(true);
+    }
+  }, [cosmosToUse]);
+  
+  // Light up only the active device
+  useEffect(() => {
+    if (gameStarted && cosmosToUse.length > 0) {
+      cosmosToUse.forEach((device, idx) => {
+        const shouldBeLit = idx === activeIndex;
+        const luminosity = shouldBeLit ? 64 : 0;
+        wsService.setLuminosity(device.id, luminosity);
+      });
+    }
+  }, [activeIndex, gameStarted]);
+  
+  return (
+    &lt;div className="min-h-screen flex flex-col bg-white"&gt;
+      {/* Game circles showing device states */}
+      &lt;div className="flex flex-row items-center justify-center gap-12"&gt;
+        {cosmosToUse.map((device, idx) =&gt; {
+          const isActive = idx === activeIndex;
+          const colorInfo = colorMap[idx % colorMap.length];
+          return (
+            &lt;div
+              key={device.id}
+              className={`rounded-full border-4 ${
+                isActive ? `${colorInfo.bgTailwind} border-white` : 
+                `${colorInfo.tailwind} bg-white`
+              }`}
+              style={{ width: 180, height: 180 }}
+            /&gt;
+          );
+        })}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
 }</code></pre>
         </div>
 
@@ -362,26 +414,125 @@ ws.onopen = () => {
         <h1 id="code-samples">📋 Code Samples</h1>
 
         <div class="api-box">
-            <h4>Multi-Device Light Show</h4>
-            <pre><code>class CosmoLightShow {
-  async rainbowPattern(devices, duration = 5000) {
-    const colors = [
-      [255, 0, 0], [255, 127, 0], [255, 255, 0],
-      [0, 255, 0], [0, 0, 255], [75, 0, 130]
-    ];
+            <h4>Multi-Device Control from ExerciseGame.js</h4>
+            <pre><code>import wsService from '../services/WebSocketService';
+
+// Real device initialization and control pattern
+const initializeDevices = () => {
+  // Color mapping from the actual application
+  const colorMap = [
+    { name: 'blue', rgb: [0, 0, 4] },
+    { name: 'green', rgb: [0, 4, 0] },
+    { name: 'yellow', rgb: [4, 3, 0] },
+    { name: 'orange', rgb: [4, 1, 0] },
+    { name: 'red', rgb: [4, 0, 0] },
+    { name: 'purple', rgb: [4, 0, 4] },
+  ];
+  
+  // Initialize each device with its assigned color
+  cosmosToUse.forEach((device, idx) => {
+    console.log(`Setting up device ${device.id} (index ${idx})`);
+    const [r, g, b] = colorMap[idx % colorMap.length].rgb;
     
-    const stepDuration = duration / colors.length;
+    // Set the device color and initial luminosity
+    wsService.setColor(device.id, r, g, b);
+    wsService.setLuminosity(device.id, 0); // Start dim
+  });
+};
+
+// Dynamic lighting control during gameplay
+const updateDeviceLighting = (activeIndex) => {
+  cosmosToUse.forEach((device, idx) => {
+    const shouldBeLit = idx === activeIndex;
+    const luminosity = shouldBeLit ? 64 : 0; // Bright when active, off when inactive
     
-    for (let i = 0; i < colors.length; i++) {
-      const [r, g, b] = colors[i];
-      devices.forEach(deviceId => {
-        this.deviceManager.setColor(deviceId, r, g, b);
-        this.deviceManager.setLuminosity(deviceId, 128);
-      });
+    console.log(`${shouldBeLit ? 'Lighting up' : 'Turning off'} device ${device.id}`);
+    wsService.setLuminosity(device.id, luminosity);
+  });
+};
+
+// Cleanup when game ends
+const cleanupDevices = () => {
+  cosmosToUse.forEach((device, idx) => {
+    const [r, g, b] = colorMap[idx % colorMap.length].rgb;
+    wsService.setColor(device.id, r, g, b);
+    wsService.setLuminosity(device.id, 0); // Turn off all lights
+  });
+};</code></pre>
+        </div>
+
+        <div class="api-box">
+            <h4>Device Selection Pattern from ExerciseSettings.js</h4>
+            <pre><code>import { useWebSocket } from '../contexts/WebSocketContext';
+
+// Real device management from ExerciseSettings component
+export default function ExerciseSettings() {
+  const { connectedDevices } = useWebSocket();
+  const numCosmos = connectedDevices.length;
+  
+  // Device indicator rendering with real connection status
+  const renderDeviceIndicators = () => {
+    return (
+      &lt;div className="flex gap-2"&gt;
+        {Array.from({ length: 6 }, (_, index) => {
+          const i = index + 1;
+          const isEnabled = index < numCosmos; // Only show enabled for connected devices
+          
+          // Real color scheme from the application
+          const colors = [
+            { bg: '#E3F2FD', border: '#2196F3', text: '#2196F3' }, // blue
+            { bg: '#E8F5E8', border: '#4CAF50', text: '#4CAF50' }, // green
+            { bg: '#FFF9E1', border: '#FFC107', text: '#FFC107' }, // yellow
+            { bg: '#FFF3E0', border: '#FF9800', text: '#FF9800' }, // orange
+            { bg: '#FFEBEE', border: '#F44336', text: '#F44336' }, // red
+            { bg: '#F3E5F5', border: '#9C27B0', text: '#9C27B0' }  // purple
+          ];
+          
+          const colorIndex = index % colors.length;
+          const { bg, border, text } = colors[colorIndex];
+          
+          return (
+            &lt;div
+              key={i}
+              className="flex items-center justify-center rounded-full"
+              style={{
+                width: '40px', height: '40px',
+                backgroundColor: isEnabled ? bg : '#F5F5F5',
+                border: `1px solid ${isEnabled ? border : '#D9D9D9'}`,
+                color: isEnabled ? text : '#9E9E9E',
+                opacity: isEnabled ? 1 : 0.5 // Disabled devices are semi-transparent
+              }}
+            &gt;
+              {i}
+            &lt;/div&gt;
+          );
+        })}
+      &lt;/div&gt;
+    );
+  };
+  
+  // Game navigation with device state
+  const handlePlay = () => {
+    navigate('/exercise', { 
+      state: { 
+        numCosmos, // Pass actual connected device count
+        duration: selectedDuration,
+        soundEnabled,
+        backgroundTrackId: selectedTrackId,
+        backgroundVolume 
+      } 
+    });
+  };
+  
+  return (
+    &lt;div&gt;
+      {/* Device indicators show connection status */}
+      {renderDeviceIndicators()}
       
-      await new Promise(resolve => setTimeout(resolve, stepDuration));
-    }
-  }
+      {/* Other settings... */}
+      &lt;button onClick={handlePlay}&gt;Play&lt;/button&gt;
+    &lt;/div&gt;
+  );
 }</code></pre>
         </div>
 
