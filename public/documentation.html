@@ -185,69 +185,221 @@ ws.onopen = () => {
 };</code></pre>
         </div>
 
-        <h2>Core Messages</h2>
-
-        <h3>Device Management</h3>
-        <div class="api-box">
-            <h4>Get All Devices</h4>
-            <p><strong>Request:</strong></p>
-            <pre><code>{ "type": "getDevices" }</code></pre>
-            <p><strong>Response:</strong></p>
-            <pre><code>{
-  "type": "devices",
-  "devices": [
-    {
-      "id": "device-uuid-string",
-      "name": "Cosmo Device",
-      "serial": "2405002009",
-      "firmware": "4.6.00",
-      "batteryLevel": 85,
-      "connected": true,
-      "buttonState": 0,
-      "pressValue": 0,
-      "color": [0, 0, 0],
-      "luminosity": 0
-    }
-  ]
-}</code></pre>
-        </div>
-
-        <h3>Device Control</h3>
-        <div class="api-box">
-            <h4>Set Device Color</h4>
-            <pre><code>{
+        <h2>Complete API Reference</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <!-- Left Column -->
+            <div>
+                <h3 style="margin-top: 0;">📥 Outgoing Messages (Your App → Bridge)</h3>
+                
+                <div class="api-box">
+                    <h4>Device Discovery</h4>
+                    <pre><code>{ "type": "getDevices" }</code></pre>
+                    <small>Get list of all connected devices</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Device Color Control</h4>
+                    <pre><code>{
   "type": "setColor",
-  "deviceId": "device-uuid-string",
+  "deviceId": "device-uuid",
   "color": { "r": 255, "g": 0, "b": 128 }
 }</code></pre>
-            
-            <p><strong>Example Colors:</strong></p>
-            <span class="color-demo color-red"></span> Red: {r: 255, g: 0, b: 0}<br/>
-            <span class="color-demo color-green"></span> Green: {r: 0, g: 255, b: 0}<br/>
-            <span class="color-demo color-blue"></span> Blue: {r: 0, g: 0, b: 255}<br/>
-            <span class="color-demo color-yellow"></span> Yellow: {r: 255, g: 255, b: 0}<br/>
-            <span class="color-demo color-purple"></span> Purple: {r: 255, g: 0, b: 255}<br/>
-            <span class="color-demo color-cyan"></span> Cyan: {r: 0, g: 255, b: 255}
-        </div>
-
-        <h3>Button Events</h3>
-        <div class="api-box">
-            <h4>Button Press Event</h4>
-            <pre><code>{
-  "type": "buttonPress",
-  "deviceId": "device-uuid-string",
-  "pressValue": 255,
-  "timestamp": "2025-09-02T12:00:00.000Z"
+                    <small>RGB values: 0-255 each</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Device Brightness</h4>
+                    <pre><code>{
+  "type": "setLuminosity",
+  "deviceId": "device-uuid",
+  "data": [64]
 }</code></pre>
+                    <small>Intensity: 0-255 (0=off, 64=bright)</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Device Mode</h4>
+                    <pre><code>{
+  "type": "setMode",
+  "deviceId": "device-uuid",
+  "data": [4]
+}</code></pre>
+                    <small>Set device operating mode</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Device Locking</h4>
+                    <pre><code>{
+  "type": "lockDevices",
+  "isLocked": true,
+  "deviceIds": ["device-1", "device-2"]
+}</code></pre>
+                    <small>Prevent other apps from using devices</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Health Check</h4>
+                    <pre><code>{ "type": "ping" }</code></pre>
+                    <small>Test bridge connection</small>
+                </div>
+            </div>
+            
+            <!-- Right Column -->
+            <div>
+                <h3 style="margin-top: 0;">📤 Incoming Messages (Bridge → Your App)</h3>
+                
+                <div class="api-box">
+                    <h4>Device List Response</h4>
+                    <pre><code>{
+  "type": "devices",
+  "devices": [{
+    "id": "device-uuid",
+    "name": "Cosmo Device",
+    "serial": "2405002009",
+    "firmware": "4.6.00",
+    "batteryLevel": 85,
+    "connected": true,
+    "buttonState": 0,
+    "pressValue": 0,
+    "color": [0, 0, 0],
+    "luminosity": 0
+  }]
+}</code></pre>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Button Press Event</h4>
+                    <pre><code>{
+  "type": "buttonPress",
+  "deviceId": "device-uuid",
+  "pressValue": 255
+}</code></pre>
+                    <small>Triggered when button is pressed</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Button Release Event</h4>
+                    <pre><code>{
+  "type": "buttonRelease",
+  "deviceId": "device-uuid",
+  "pressValue": 0
+}</code></pre>
+                    <small>Triggered when button is released</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Button State Change</h4>
+                    <pre><code>{
+  "type": "buttonStateChanged",
+  "deviceId": "device-uuid",
+  "buttonState": "pressed",
+  "pressValue": 255
+}</code></pre>
+                    <small>General button state updates</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Device Update</h4>
+                    <pre><code>{
+  "type": "deviceUpdate",
+  "deviceId": "device-uuid",
+  "batteryLevel": 82,
+  "connected": true
+}</code></pre>
+                    <small>Real-time device status changes</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Lock State Changed</h4>
+                    <pre><code>{
+  "type": "lockStateChanged",
+  "isLocked": true,
+  "deviceIds": ["device-1"]
+}</code></pre>
+                    <small>Device lock status update</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Error Messages</h4>
+                    <pre><code>{
+  "type": "error",
+  "message": "Device not found",
+  "deviceId": "device-uuid"
+}</code></pre>
+                    <small>Error notifications</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="api-box">
+            <h4>🎨 Color Reference</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                <span><span class="color-demo color-red"></span> Red: {r: 255, g: 0, b: 0}</span>
+                <span><span class="color-demo color-green"></span> Green: {r: 0, g: 255, b: 0}</span>
+                <span><span class="color-demo color-blue"></span> Blue: {r: 0, g: 0, b: 255}</span>
+                <span><span class="color-demo color-yellow"></span> Yellow: {r: 255, g: 255, b: 0}</span>
+                <span><span class="color-demo color-purple"></span> Purple: {r: 255, g: 0, b: 255}</span>
+                <span><span class="color-demo color-cyan"></span> Cyan: {r: 0, g: 255, b: 255}</span>
+            </div>
         </div>
 
+        <h2>Additional Message Types</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <div class="api-box">
+                <h4>Characteristic Value Changed</h4>
+                <pre><code>{
+  "type": "characteristicValueChanged",
+  "deviceId": "device-uuid",
+  "characteristic": "button",
+  "value": [1]
+}</code></pre>
+                <small>Raw BLE characteristic updates</small>
+            </div>
+            
+            <div class="api-box">
+                <h4>Request Device Scan</h4>
+                <pre><code>{
+  "type": "requestScan",
+  "duration": 10000
+}</code></pre>
+                <small>Scan for new devices (duration in ms)</small>
+            </div>
+        </div>
+        
         <div class="warning-box">
             <h4>⚡ Performance Guidelines</h4>
             <ul>
                 <li><strong>Rate Limiting:</strong> Maximum 10 messages/second per device</li>
                 <li><strong>Button Response:</strong> &lt;50ms from WebSocket message to UI update</li>
                 <li><strong>Multi-device:</strong> Tested with 6+ simultaneous connections</li>
+                <li><strong>Connection Health:</strong> Send ping every 30 seconds to maintain connection</li>
+                <li><strong>Error Handling:</strong> Always validate message structure before processing</li>
             </ul>
+        </div>
+
+        <div class="success-box">
+            <h4>🚀 Quick Start</h4>
+            <pre><code>const ws = new WebSocket('ws://localhost:8080');
+
+ws.onopen = () => {
+  console.log('Connected to Cosmo Bridge');
+  ws.send(JSON.stringify({ type: 'getDevices' }));
+};
+
+ws.onmessage = (event) => {
+  const message = JSON.parse(event.data);
+  
+  switch (message.type) {
+    case 'devices':
+      console.log('Connected devices:', message.devices);
+      break;
+    case 'buttonPress':
+      console.log(`Button pressed on device: ${message.deviceId}`);
+      break;
+  }
+};</code></pre>
         </div>
 
         <!-- Web Development Guide -->
