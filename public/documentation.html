@@ -252,130 +252,305 @@ ws.onopen = () => {
 
         <!-- Web Development Guide -->
         <h1 id="web-development-guide">💻 Web Development Guide</h1>
+        
+        <p>This guide walks you through building a React app with Cosmo Bridge, step by step using real code from our working implementation.</p>
 
-        <h2>2. Device Management & Event Handling</h2>
+        <h2>Step 1: Connect to Cosmo Bridge</h2>
+        <p>First, establish a WebSocket connection to get access to connected Cosmo devices. We use React Context to manage the connection state.</p>
+        
         <div class="api-box">
-            <h4>Real Implementation from ExerciseGame.js</h4>
-            <pre><code>// Button press handling with debouncing and game logic
-const handleButtonPress = useCallback((deviceId) => {
-  // Don't process button presses if game is over
-  if (gameOver) {
-    console.log(`[ExerciseGame] ❌ Button press ignored - game is over`);
-    return;
-  }
-  
-  if (!activeDevice || deviceId !== activeDevice.id) {
-    console.log(`[ExerciseGame] ❌ Button press ignored - deviceId mismatch`);
-    return;
-  }
-  
-  console.log(`[ExerciseGame] ✅ Correct button press! Score: ${score + 1}`);
-  
-  // Play MIDI note based on the current active index
-  playMIDINote(activeIndex, 100, 0.3);
-  
-  setScore(s => s + 1);
-  setActiveIndex(i => (i + 1) % cosmosToUse.length);
-}, [activeDevice, cosmosToUse, score, activeIndex, playMIDINote, gameOver]);
+            <h4>From ExerciseSettings.js - Getting Connected Devices</h4>
+            <pre><code>import { useWebSocket } from '../contexts/WebSocketContext';
 
-// Button state monitoring with proper debouncing
-const checkButtonStates = useCallback(() => {
-  if (gameOver || !gameStarted || !activeDevice || !deviceValues[activeDevice.id]) {
-    return;
-  }
+export default function ExerciseSettings() {
+  // Get connected devices from WebSocket context
+  const { connectedDevices } = useWebSocket();
+  const numCosmos = connectedDevices.length;
   
-  const deviceValue = deviceValues[activeDevice.id];
-  const currentButtonState = deviceValue.buttonState;
-  const previousButtonState = previousButtonStates.current[activeDevice.id];
+  console.log(`Found ${numCosmos} connected devices:`, connectedDevices);
   
-  const wasReleased = previousButtonState === 0;
-  const isPressed = currentButtonState === 1;
-  
-  if (wasReleased && isPressed) {
-    const now = Date.now();
-    if (!lastPressRef.current[activeDevice.id] || now - lastPressRef.current[activeDevice.id] > 500) {
-      lastPressRef.current[activeDevice.id] = now;
-      handleButtonPress(activeDevice.id);
-    }
-  }
-  
-  // Update previous state
-  previousButtonStates.current[activeDevice.id] = currentButtonState;
-}, [gameStarted, activeDevice, deviceValues, handleButtonPress, gameOver]);</code></pre>
+  // Each device object contains:
+  // {
+  //   id: "device-uuid-string",
+  //   name: "Cosmo Device", 
+  //   serial: "2405002009",
+  //   batteryLevel: 85,
+  //   connected: true
+  // }
+}</code></pre>
+        </div>
+        
+        <div class="info-box">
+            <p><strong>💡 What's happening:</strong> The <code>useWebSocket</code> hook automatically connects to <code>ws://localhost:8080</code> and provides real-time access to connected Cosmo devices. No manual WebSocket management needed!</p>
         </div>
 
-        <h2>3. React Integration Example</h2>
+        <h2>Step 2: Display Device Connection Status</h2>
+        <p>Show users which devices are connected with visual indicators that update in real-time.</p>
+        
         <div class="api-box">
-            <h4>Complete React Component from ExerciseGame.js</h4>
-            <pre><code>import { useWebSocket } from '../contexts/WebSocketContext';
-import wsService from '../services/WebSocketService';
+            <h4>From ExerciseSettings.js - Device Indicators</h4>
+            <pre><code>// Show 6 potential device slots, but only enable connected ones
+const renderDeviceIndicators = () => {
+  return (
+    &lt;div className="flex gap-2"&gt;
+      {Array.from({ length: 6 }, (_, index) => {
+        const i = index + 1;
+        const isEnabled = index < numCosmos; // Only enabled if device is connected
+        
+        // Real color scheme from our app
+        const colors = [
+          { bg: '#E3F2FD', border: '#2196F3', text: '#2196F3' }, // blue
+          { bg: '#E8F5E8', border: '#4CAF50', text: '#4CAF50' }, // green  
+          { bg: '#FFF9E1', border: '#FFC107', text: '#FFC107' }, // yellow
+          { bg: '#FFF3E0', border: '#FF9800', text: '#FF9800' }, // orange
+          { bg: '#FFEBEE', border: '#F44336', text: '#F44336' }, // red
+          { bg: '#F3E5F5', border: '#9C27B0', text: '#9C27B0' }  // purple
+        ];
+        
+        const colorIndex = index % colors.length;
+        const { bg, border, text } = colors[colorIndex];
+        
+        return (
+          &lt;div
+            key={i}
+            style={{
+              width: '40px', height: '40px',
+              backgroundColor: isEnabled ? bg : '#F5F5F5', // Gray when disconnected
+              border: `1px solid ${isEnabled ? border : '#D9D9D9'}`,
+              color: isEnabled ? text : '#9E9E9E',
+              opacity: isEnabled ? 1 : 0.5 // Semi-transparent when disabled
+            }}
+          &gt;
+            {i}
+          &lt;/div&gt;
+        );
+      })}
+    &lt;/div&gt;
+  );
+};</code></pre>
+        </div>
+        
+        <div class="info-box">
+            <p><strong>💡 What's happening:</strong> This creates a visual representation showing up to 6 device slots. Connected devices appear in color, while disconnected slots are grayed out. The UI updates automatically as devices connect/disconnect.</p>
+        </div>
 
-// Color mapping for devices
+        <h2>Step 3: Control Device Colors and Lighting</h2>
+        <p>Use the WebSocket service to send commands to your connected devices. Set colors and brightness levels.</p>
+        
+        <div class="api-box">
+            <h4>From ExerciseGame.js - Device Control</h4>
+            <pre><code>import wsService from '../services/WebSocketService';
+
+// Define colors for each device (RGB values 0-4 for Cosmo devices)
 const colorMap = [
   { name: 'blue', rgb: [0, 0, 4] },
-  { name: 'green', rgb: [0, 4, 0] },
+  { name: 'green', rgb: [0, 4, 0] },  
   { name: 'yellow', rgb: [4, 3, 0] },
   { name: 'orange', rgb: [4, 1, 0] },
   { name: 'red', rgb: [4, 0, 0] },
   { name: 'purple', rgb: [4, 0, 4] },
 ];
 
-export default function ExerciseGame() {
+// Initialize each device with its assigned color
+const initializeDevices = () => {
+  cosmosToUse.forEach((device, idx) => {
+    console.log(`Setting up device ${device.id} (index ${idx})`);
+    const [r, g, b] = colorMap[idx % colorMap.length].rgb;
+    
+    // Set the device color and start with lights off
+    wsService.setColor(device.id, r, g, b);
+    wsService.setLuminosity(device.id, 0); // 0 = off, 64 = bright
+  });
+};
+
+// Light up specific devices during gameplay
+const updateDeviceLighting = (activeIndex) => {
+  cosmosToUse.forEach((device, idx) => {
+    const shouldBeLit = idx === activeIndex;
+    const luminosity = shouldBeLit ? 64 : 0;
+    
+    wsService.setLuminosity(device.id, luminosity);
+  });
+};</code></pre>
+        </div>
+        
+        <div class="info-box">
+            <p><strong>💡 What's happening:</strong> <code>wsService.setColor()</code> sets the RGB color (values 0-4), and <code>wsService.setLuminosity()</code> controls brightness (0-64). Commands are sent immediately via WebSocket.</p>
+        </div>
+
+        <h2>Step 4: Handle Button Press Events</h2>
+        <p>Listen for button presses and respond with proper debouncing to prevent multiple triggers.</p>
+        
+        <div class="api-box">
+            <h4>From ExerciseGame.js - Button Event Handling</h4>
+            <pre><code>// Get real-time device data including button states
+const { connectedDevices, deviceValues } = useWebSocket();
+
+// Handle button press with game logic
+const handleButtonPress = useCallback((deviceId) => {
+  console.log(`Button pressed on device: ${deviceId}`);
+  
+  // Your game logic here - check if correct device was pressed
+  if (deviceId === activeDevice.id) {
+    console.log('Correct button pressed!');
+    setScore(s => s + 1);
+    // Move to next device
+    setActiveIndex(i => (i + 1) % cosmosToUse.length);
+  }
+}, [activeDevice, cosmosToUse]);
+
+// Monitor button state changes with debouncing
+const checkButtonStates = useCallback(() => {
+  if (!activeDevice || !deviceValues[activeDevice.id]) return;
+  
+  const deviceValue = deviceValues[activeDevice.id];
+  const currentButtonState = deviceValue.buttonState; // 0 = released, 1 = pressed
+  const previousButtonState = previousButtonStates.current[activeDevice.id];
+  
+  // Detect button press (transition from released to pressed)
+  const wasReleased = previousButtonState === 0;
+  const isPressed = currentButtonState === 1;
+  
+  if (wasReleased && isPressed) {
+    // Debounce: only allow one press per 500ms
+    const now = Date.now();
+    if (!lastPressRef.current[activeDevice.id] || 
+        now - lastPressRef.current[activeDevice.id] > 500) {
+      lastPressRef.current[activeDevice.id] = now;
+      handleButtonPress(activeDevice.id);
+    }
+  }
+  
+  // Remember current state for next check
+  previousButtonStates.current[activeDevice.id] = currentButtonState;
+}, [activeDevice, deviceValues, handleButtonPress]);
+
+// Check button states when device values change
+useEffect(() => {
+  if (activeDevice && deviceValues[activeDevice.id]) {
+    checkButtonStates();
+  }
+}, [deviceValues, activeDevice, checkButtonStates]);</code></pre>
+        </div>
+        
+        <div class="info-box">
+            <p><strong>💡 What's happening:</strong> <code>deviceValues</code> contains real-time data from all devices. We monitor <code>buttonState</code> changes and use debouncing (500ms) to prevent accidental double-presses. Button state: 0 = released, 1 = pressed.</p>
+        </div>
+
+        <h2>Step 5: Build Your Complete Component</h2>
+        <p>Put it all together in a React component that manages device state, handles events, and updates the UI.</p>
+        
+        <div class="api-box">
+            <h4>Complete React Component Pattern</h4>
+            <pre><code>import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useWebSocket } from '../contexts/WebSocketContext';
+import wsService from '../services/WebSocketService';
+
+export default function MyCosmosGame() {
+  // 1. Get WebSocket connection and device data
   const { connectedDevices, deviceValues } = useWebSocket();
+  
+  // 2. Component state
   const [activeIndex, setActiveIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   
-  // Get connected devices for the game
-  const cosmosToUse = useMemo(() => 
-    connectedDevices.slice(0, numCosmos), [connectedDevices, numCosmos]);
+  // 3. Get devices to use (limit to available devices)
+  const devicesToUse = useMemo(() => 
+    connectedDevices.slice(0, 3), [connectedDevices]);
   
-  // Initialize device colors and lighting
+  const activeDevice = devicesToUse[activeIndex];
+  
+  // 4. Initialize devices when component mounts
   useEffect(() => {
-    if (cosmosToUse.length > 0 && !hasInitializedRef.current) {
-      hasInitializedRef.current = true;
-      cosmosToUse.forEach((device, idx) => {
-        const [r, g, b] = colorMap[idx % colorMap.length].rgb;
+    if (devicesToUse.length > 0) {
+      devicesToUse.forEach((device, idx) => {
+        const colors = [[4,0,0], [0,4,0], [0,0,4]]; // Red, Green, Blue
+        const [r, g, b] = colors[idx % colors.length];
+        
         wsService.setColor(device.id, r, g, b);
-        wsService.setLuminosity(device.id, 0); // Start with zero luminosity
+        wsService.setLuminosity(device.id, 0);
       });
       setGameStarted(true);
     }
-  }, [cosmosToUse]);
+  }, [devicesToUse]);
   
-  // Light up only the active device
+  // 5. Update lighting when active device changes
   useEffect(() => {
-    if (gameStarted && cosmosToUse.length > 0) {
-      cosmosToUse.forEach((device, idx) => {
-        const shouldBeLit = idx === activeIndex;
-        const luminosity = shouldBeLit ? 64 : 0;
+    if (gameStarted && devicesToUse.length > 0) {
+      devicesToUse.forEach((device, idx) => {
+        const luminosity = idx === activeIndex ? 64 : 0;
         wsService.setLuminosity(device.id, luminosity);
       });
     }
-  }, [activeIndex, gameStarted]);
+  }, [activeIndex, gameStarted, devicesToUse]);
   
+  // 6. Handle button presses
+  const handleButtonPress = useCallback((deviceId) => {
+    if (deviceId === activeDevice?.id) {
+      setScore(s => s + 1);
+      setActiveIndex(i => (i + 1) % devicesToUse.length);
+    }
+  }, [activeDevice, devicesToUse]);
+  
+  // 7. Monitor button states (simplified version)
+  useEffect(() => {
+    if (!activeDevice || !deviceValues[activeDevice.id]) return;
+    
+    const checkButton = () => {
+      const deviceValue = deviceValues[activeDevice.id];
+      if (deviceValue.buttonState === 1) { // Pressed
+        handleButtonPress(activeDevice.id);
+      }
+    };
+    
+    const interval = setInterval(checkButton, 100);
+    return () => clearInterval(interval);
+  }, [activeDevice, deviceValues, handleButtonPress]);
+  
+  // 8. Render your game UI
   return (
-    &lt;div className="min-h-screen flex flex-col bg-white"&gt;
-      {/* Game circles showing device states */}
-      &lt;div className="flex flex-row items-center justify-center gap-12"&gt;
-        {cosmosToUse.map((device, idx) =&gt; {
-          const isActive = idx === activeIndex;
-          const colorInfo = colorMap[idx % colorMap.length];
-          return (
-            &lt;div
-              key={device.id}
-              className={`rounded-full border-4 ${
-                isActive ? `${colorInfo.bgTailwind} border-white` : 
-                `${colorInfo.tailwind} bg-white`
-              }`}
-              style={{ width: 180, height: 180 }}
-            /&gt;
-          );
-        })}
+    &lt;div className="game-container"&gt;
+      &lt;h1&gt;Score: {score}&lt;/h1&gt;
+      &lt;p&gt;Press the lit-up device!&lt;/p&gt;
+      
+      &lt;div className="devices"&gt;
+        {devicesToUse.map((device, idx) =&gt; (
+          &lt;div 
+            key={device.id}
+            className={idx === activeIndex ? 'device active' : 'device'}
+          &gt;
+            Device {idx + 1}
+          &lt;/div&gt;
+        ))}
       &lt;/div&gt;
     &lt;/div&gt;
   );
 }</code></pre>
+        </div>
+        
+        <div class="success-box">
+            <h4>🎉 You're Ready!</h4>
+            <p>This complete example shows how to:</p>
+            <ul>
+                <li><strong>Connect</strong> to Cosmo Bridge automatically</li>
+                <li><strong>Control</strong> device colors and lighting</li>
+                <li><strong>Handle</strong> button press events</li>
+                <li><strong>Build</strong> interactive games and experiences</li>
+            </ul>
+            <p>Modify the game logic, colors, and UI to create your own unique Cosmo experience!</p>
+        </div>
+
+        <h2>Next Steps</h2>
+        <div class="info-box">
+            <p><strong>🚀 Ready to build your own?</strong></p>
+            <ul>
+                <li>Copy the complete component above as your starting point</li>
+                <li>Modify the game logic for your use case</li>
+                <li>Add your own UI styling and animations</li>
+                <li>Test with real Cosmo devices connected via the bridge</li>
+                <li>Deploy your web app to any hosting service</li>
+            </ul>
         </div>
 
         <!-- Installation & Deployment -->
