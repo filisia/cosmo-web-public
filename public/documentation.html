@@ -238,11 +238,6 @@ ws.onopen = () => {
                     <small>Prevent other apps from using devices</small>
                 </div>
                 
-                <div class="api-box">
-                    <h4>Health Check</h4>
-                    <pre><code>{ "type": "ping" }</code></pre>
-                    <small>Test bridge connection (expect pong response)</small>
-                </div>
                 
                 <div class="api-box">
                     <h4>Request Device Scan</h4>
@@ -339,14 +334,6 @@ ws.onopen = () => {
                     <small>Error notifications</small>
                 </div>
                 
-                <div class="api-box">
-                    <h4>Ping Response</h4>
-                    <pre><code>{
-  "type": "pong",
-  "timestamp": "2025-09-03T10:30:00.000Z"
-}</code></pre>
-                    <small>Response to ping health check</small>
-                </div>
             </div>
         </div>
         
@@ -400,7 +387,6 @@ ws.onopen = () => {
                         <li>setLuminosity</li>
                         <li>setMode</li>
                         <li>lockDevices</li>
-                        <li>ping</li>
                         <li>requestScan</li>
                     </ul>
                 </div>
@@ -414,7 +400,6 @@ ws.onopen = () => {
                         <li>deviceUpdate</li>
                         <li>lockStateChanged</li>
                         <li>error</li>
-                        <li>pong</li>
                         <li>characteristicValueChanged</li>
                         <li>deviceConnectionChanged</li>
                     </ul>
@@ -428,7 +413,6 @@ ws.onopen = () => {
                 <li><strong>Rate Limiting:</strong> Maximum 10 messages/second per device</li>
                 <li><strong>Button Response:</strong> &lt;50ms from WebSocket message to UI update</li>
                 <li><strong>Multi-device:</strong> Tested with 6+ simultaneous connections</li>
-                <li><strong>Connection Health:</strong> Send ping every 30 seconds to maintain connection</li>
                 <li><strong>Error Handling:</strong> Always validate message structure before processing</li>
             </ul>
         </div>
@@ -938,7 +922,7 @@ const healthCheck = () => {
   const ws = new WebSocket('ws://localhost:8080');
   ws.onopen = () => {
     console.log('✓ Bridge connection successful');
-    ws.send(JSON.stringify({ type: 'ping' }));
+    // Connection established
   };
   ws.onerror = () => {
     console.log('✗ Bridge connection failed');
