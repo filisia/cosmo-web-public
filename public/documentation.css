@@ -307,6 +307,47 @@ pre {
     overflow-x: auto;
     margin: 12px 0;
     border-left: 4px solid var(--cosmo-purple);
+    position: relative;
+}
+
+/* Copy Button */
+.copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e2e8f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+}
+
+.copy-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.copy-btn.copied {
+    background: var(--cosmo-green);
+    border-color: var(--cosmo-green);
+    color: white;
+}
+
+.copy-btn::before {
+    content: '📋';
+    margin-right: 4px;
+}
+
+.copy-btn.copied::before {
+    content: '✓';
+    margin-right: 4px;
 }
 
 code {

@@ -20,12 +20,12 @@
                 <ul>
                     <li><a href="#overview">1. Overview & Live Demo</a></li>
                     <li><a href="#bridge-applications">2. Bridge Applications</a></li>
-                    <li><a href="#websocket-api-reference">3. WebSocket API Reference</a></li>
-                    <li><a href="#web-development-guide">4. Web Development Guide</a></li>
+                    <li><a href="#web-development-guide">3. Web Development</a></li>
+                    <li><a href="#code-samples">4. Code Samples</a></li>
                     <li><a href="#installation-deployment">5. Installation & Deployment</a></li>
-                    <li><a href="#code-samples">6. Code Samples</a></li>
+                    <li><a href="#websocket-api-reference">6. WebSocket API Reference</a></li>
                     <li><a href="#troubleshooting">7. Troubleshooting</a></li>
-                    <li><a href="#getting-started-checklist">8. Getting Started Checklist</a></li>
+                    <li><a href="#getting-started-checklist">8. Distribution Checklist</a></li>
                 </ul>
             </div>
         </div>
@@ -171,277 +171,8 @@
             </ol>
         </div>
 
-        <!-- WebSocket API Reference -->
-        <h1 id="websocket-api-reference">🔗 WebSocket API Reference</h1>
-
-        <div class="api-box">
-            <h4>Connection</h4>
-            <p><strong>Endpoint:</strong> <code>ws://localhost:8080</code></p>
-            <pre><code>const ws = new WebSocket('ws://localhost:8080');
-
-ws.onopen = () => {
-  console.log('Connected to Cosmo Bridge');
-  ws.send(JSON.stringify({ type: 'getDevices' }));
-};</code></pre>
-        </div>
-
-        <h2>Complete API Reference</h2>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-            <!-- Left Column -->
-            <div>
-                <h3 style="margin-top: 0;">📥 Outgoing Messages (Your App → Bridge)</h3>
-                
-                <div class="api-box">
-                    <h4>Device Discovery</h4>
-                    <pre><code>{ "type": "getDevices" }</code></pre>
-                    <small>Get list of all connected devices</small>
-                </div>
-                
-                <div class="api-box">
-                    <h4>Device Color Control</h4>
-                    <pre><code>{
-  "type": "setColor",
-  "deviceId": "device-uuid",
-  "color": { "r": 255, "g": 0, "b": 128 }
-}</code></pre>
-                    <small>RGB values: 0-255 each</small>
-                </div>
-                
-                <div class="api-box">
-                    <h4>Device Brightness</h4>
-                    <pre><code>{
-  "type": "setLuminosity",
-  "deviceId": "device-uuid",
-  "data": [64]
-}</code></pre>
-                    <small>Intensity: 0-255 (0=off, 64=bright)</small>
-                </div>
-                
-                <div class="api-box">
-                    <h4>Device Mode</h4>
-                    <pre><code>{
-  "type": "setMode",
-  "deviceId": "device-uuid",
-  "data": [4]
-}</code></pre>
-                    <small>Set device operating mode</small>
-                </div>
-                
-                <div class="api-box">
-                    <h4>Device Locking</h4>
-                    <pre><code>{
-  "type": "lockDevices",
-  "isLocked": true,
-  "deviceIds": ["device-1", "device-2"]
-}</code></pre>
-                    <small>Prevent other apps from using devices</small>
-                </div>
-                
-                
-                <div class="api-box">
-                    <h4>Request Device Scan</h4>
-                    <pre><code>{
-  "type": "requestScan",
-  "duration": 10000
-}</code></pre>
-                    <small>Scan for new devices (duration in ms)</small>
-                </div>
-            </div>
-            
-            <!-- Right Column -->
-            <div>
-                <h3 style="margin-top: 0;">📤 Incoming Messages (Bridge → Your App)</h3>
-                
-                <div class="api-box">
-                    <h4>Device List Response</h4>
-                    <pre><code>{
-  "type": "devices",
-  "devices": [{
-    "id": "device-uuid",
-    "name": "Cosmo Device",
-    "serial": "2405002009",
-    "firmware": "4.6.00",
-    "batteryLevel": 85,
-    "connected": true,
-    "buttonState": 0,
-    "pressValue": 0,
-    "color": [0, 0, 0],
-    "luminosity": 0
-  }]
-}</code></pre>
-                </div>
-                
-                <div class="api-box">
-                    <h4>Button Press Event</h4>
-                    <pre><code>{
-  "type": "buttonPress",
-  "deviceId": "device-uuid",
-  "pressValue": 255
-}</code></pre>
-                    <small>Triggered when button is pressed</small>
-                </div>
-                
-                <div class="api-box">
-                    <h4>Button Release Event</h4>
-                    <pre><code>{
-  "type": "buttonRelease",
-  "deviceId": "device-uuid",
-  "pressValue": 0
-}</code></pre>
-                    <small>Triggered when button is released</small>
-                </div>
-                
-                <div class="api-box">
-                    <h4>Button State Change</h4>
-                    <pre><code>{
-  "type": "buttonStateChanged",
-  "deviceId": "device-uuid",
-  "buttonState": "pressed",
-  "pressValue": 255
-}</code></pre>
-                    <small>General button state updates</small>
-                </div>
-                
-                <div class="api-box">
-                    <h4>Device Update</h4>
-                    <pre><code>{
-  "type": "deviceUpdate",
-  "deviceId": "device-uuid",
-  "batteryLevel": 82,
-  "connected": true
-}</code></pre>
-                    <small>Real-time device status changes</small>
-                </div>
-                
-                <div class="api-box">
-                    <h4>Lock State Changed</h4>
-                    <pre><code>{
-  "type": "lockStateChanged",
-  "isLocked": true,
-  "deviceIds": ["device-1"]
-}</code></pre>
-                    <small>Device lock status update</small>
-                </div>
-                
-                <div class="api-box">
-                    <h4>Error Messages</h4>
-                    <pre><code>{
-  "type": "error",
-  "message": "Device not found",
-  "deviceId": "device-uuid"
-}</code></pre>
-                    <small>Error notifications</small>
-                </div>
-                
-            </div>
-        </div>
-        
-        <div class="api-box">
-            <h4>🎨 Color Reference</h4>
-            <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
-                <span><span class="color-demo color-red"></span> Red: {r: 255, g: 0, b: 0}</span>
-                <span><span class="color-demo color-green"></span> Green: {r: 0, g: 255, b: 0}</span>
-                <span><span class="color-demo color-blue"></span> Blue: {r: 0, g: 0, b: 255}</span>
-                <span><span class="color-demo color-yellow"></span> Yellow: {r: 255, g: 255, b: 0}</span>
-                <span><span class="color-demo color-purple"></span> Purple: {r: 255, g: 0, b: 255}</span>
-                <span><span class="color-demo color-cyan"></span> Cyan: {r: 0, g: 255, b: 255}</span>
-            </div>
-        </div>
-
-        <h2>Advanced Message Types</h2>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-            <div class="api-box">
-                <h4>Characteristic Value Changed</h4>
-                <pre><code>{
-  "type": "characteristicValueChanged",
-  "deviceId": "device-uuid",
-  "characteristic": "button",
-  "value": [1]
-}</code></pre>
-                <small>Raw BLE characteristic updates</small>
-            </div>
-            
-            <div class="api-box">
-                <h4>Connection State Changes</h4>
-                <pre><code>{
-  "type": "deviceConnectionChanged",
-  "deviceId": "device-uuid",
-  "connected": true,
-  "timestamp": "2025-09-03T10:30:00.000Z"
-}</code></pre>
-                <small>Device connection/disconnection events</small>
-            </div>
-        </div>
-        
-        <div class="info-box">
-            <h4>📝 Message Type Summary</h4>
-            <p><strong>All Available Message Types:</strong></p>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div>
-                    <strong>Outgoing (Your App → Bridge):</strong>
-                    <ul style="margin: 5px 0; font-family: monospace; font-size: 13px;">
-                        <li>getDevices</li>
-                        <li>setColor</li>
-                        <li>setLuminosity</li>
-                        <li>setMode</li>
-                        <li>lockDevices</li>
-                        <li>requestScan</li>
-                    </ul>
-                </div>
-                <div>
-                    <strong>Incoming (Bridge → Your App):</strong>
-                    <ul style="margin: 5px 0; font-family: monospace; font-size: 13px;">
-                        <li>devices</li>
-                        <li>buttonPress</li>
-                        <li>buttonRelease</li>
-                        <li>buttonStateChanged</li>
-                        <li>deviceUpdate</li>
-                        <li>lockStateChanged</li>
-                        <li>error</li>
-                        <li>characteristicValueChanged</li>
-                        <li>deviceConnectionChanged</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <div class="warning-box">
-            <h4>⚡ Performance Guidelines</h4>
-            <ul>
-                <li><strong>Rate Limiting:</strong> Maximum 10 messages/second per device</li>
-                <li><strong>Button Response:</strong> &lt;50ms from WebSocket message to UI update</li>
-                <li><strong>Multi-device:</strong> Tested with 6+ simultaneous connections</li>
-                <li><strong>Error Handling:</strong> Always validate message structure before processing</li>
-            </ul>
-        </div>
-
-        <div class="success-box">
-            <h4>🚀 Quick Start</h4>
-            <pre><code>const ws = new WebSocket('ws://localhost:8080');
-
-ws.onopen = () => {
-  console.log('Connected to Cosmo Bridge');
-  ws.send(JSON.stringify({ type: 'getDevices' }));
-};
-
-ws.onmessage = (event) => {
-  const message = JSON.parse(event.data);
-  
-  switch (message.type) {
-    case 'devices':
-      console.log('Connected devices:', message.devices);
-      break;
-    case 'buttonPress':
-      console.log(`Button pressed on device: ${message.deviceId}`);
-      break;
-  }
-};</code></pre>
-        </div>
-
         <!-- Web Development Guide -->
-        <h1 id="web-development-guide">💻 Web Development Guide</h1>
+        <h1 id="web-development-guide">💻 Web Development</h1>
         
         <p>This guide walks you through building a React app with Cosmo Bridge, step by step using real code from our working implementation.</p>
 
@@ -743,6 +474,484 @@ export default function MyCosmosGame() {
             </ul>
         </div>
 
+        <!-- Code Samples -->
+        <h1 id="code-samples">📋 Code Samples</h1>
+        
+        <p>Complete code examples from our working Exercise app that you can copy and modify for your own projects.</p>
+
+        <h2>Complete React Component</h2>
+        <div class="api-box">
+            <h4>ExerciseGame.js - Full Implementation</h4>
+            <pre><code>import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useWebSocket } from '../contexts/WebSocketContext';
+import wsService from '../services/WebSocketService';
+
+export default function ExerciseGame() {
+  const { connectedDevices, deviceValues } = useWebSocket();
+  const [gameStarted, setGameStarted] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [gameRunning, setGameRunning] = useState(false);
+
+  // Game state refs
+  const previousButtonStates = useRef({});
+  const lastPressRef = useRef({});
+  const gameTimerRef = useRef(null);
+
+  // Color mapping for devices
+  const colorMap = [
+    { name: 'blue', rgb: [0, 0, 4] },
+    { name: 'green', rgb: [0, 4, 0] },
+    { name: 'yellow', rgb: [4, 3, 0] },
+    { name: 'orange', rgb: [4, 1, 0] },
+    { name: 'red', rgb: [4, 0, 0] },
+    { name: 'purple', rgb: [4, 0, 4] },
+  ];
+
+  // Get devices to use for the game
+  const cosmosToUse = useMemo(() => {
+    return connectedDevices.slice(0, Math.min(6, connectedDevices.length));
+  }, [connectedDevices]);
+
+  const activeDevice = cosmosToUse[activeIndex];
+
+  // Initialize devices
+  const initializeDevices = useCallback(() => {
+    cosmosToUse.forEach((device, idx) => {
+      const [r, g, b] = colorMap[idx % colorMap.length].rgb;
+      wsService.setColor(device.id, r, g, b);
+      wsService.setLuminosity(device.id, 0);
+      previousButtonStates.current[device.id] = 0;
+    });
+  }, [cosmosToUse]);
+
+  // Update device lighting
+  const updateDeviceLighting = useCallback(() => {
+    cosmosToUse.forEach((device, idx) => {
+      const luminosity = idx === activeIndex ? 64 : 0;
+      wsService.setLuminosity(device.id, luminosity);
+    });
+  }, [cosmosToUse, activeIndex]);
+
+  // Handle button press
+  const handleButtonPress = useCallback((deviceId) => {
+    if (deviceId === activeDevice?.id && gameRunning) {
+      setScore(s => s + 1);
+      setActiveIndex(i => (i + 1) % cosmosToUse.length);
+      
+      // Show visual feedback
+      const device = cosmosToUse.find(d => d.id === deviceId);
+      if (device) {
+        const idx = cosmosToUse.indexOf(device);
+        const [r, g, b] = colorMap[idx % colorMap.length].rgb;
+        wsService.setColor(device.id, r, g, b);
+      }
+    }
+  }, [activeDevice, gameRunning, cosmosToUse]);
+
+  // Check button states with debouncing
+  const checkButtonStates = useCallback(() => {
+    if (!activeDevice || !deviceValues[activeDevice.id] || !gameRunning) return;
+
+    const deviceValue = deviceValues[activeDevice.id];
+    const currentButtonState = deviceValue.buttonState;
+    const previousButtonState = previousButtonStates.current[activeDevice.id];
+
+    const wasReleased = previousButtonState === 0;
+    const isPressed = currentButtonState === 1;
+
+    if (wasReleased && isPressed) {
+      const now = Date.now();
+      if (!lastPressRef.current[activeDevice.id] || 
+          now - lastPressRef.current[activeDevice.id] > 500) {
+        lastPressRef.current[activeDevice.id] = now;
+        handleButtonPress(activeDevice.id);
+      }
+    }
+
+    previousButtonStates.current[activeDevice.id] = currentButtonState;
+  }, [activeDevice, deviceValues, gameRunning, handleButtonPress]);
+
+  // Start game
+  const startGame = () => {
+    if (cosmosToUse.length === 0) return;
+    
+    setScore(0);
+    setTimeLeft(60);
+    setActiveIndex(0);
+    setGameRunning(true);
+    setGameStarted(true);
+    
+    initializeDevices();
+    
+    // Start game timer
+    gameTimerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          endGame();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  // End game
+  const endGame = () => {
+    setGameRunning(false);
+    if (gameTimerRef.current) {
+      clearInterval(gameTimerRef.current);
+      gameTimerRef.current = null;
+    }
+    
+    // Turn off all devices
+    cosmosToUse.forEach(device => {
+      wsService.setLuminosity(device.id, 0);
+    });
+  };
+
+  // Effects
+  useEffect(() => {
+    if (gameStarted && gameRunning && cosmosToUse.length > 0) {
+      updateDeviceLighting();
+    }
+  }, [gameStarted, gameRunning, updateDeviceLighting]);
+
+  useEffect(() => {
+    checkButtonStates();
+  }, [checkButtonStates]);
+
+  useEffect(() => {
+    return () => {
+      if (gameTimerRef.current) {
+        clearInterval(gameTimerRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    &lt;div className="exercise-game"&gt;
+      &lt;div className="game-header"&gt;
+        &lt;h2&gt;Cosmo Exercise Game&lt;/h2&gt;
+        &lt;div className="game-stats"&gt;
+          &lt;div&gt;Score: {score}&lt;/div&gt;
+          &lt;div&gt;Time: {timeLeft}s&lt;/div&gt;
+          &lt;div&gt;Devices: {cosmosToUse.length}&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {!gameStarted ? (
+        &lt;div className="game-start"&gt;
+          &lt;p&gt;Connected devices: {cosmosToUse.length}&lt;/p&gt;
+          &lt;button 
+            onClick={startGame}
+            disabled={cosmosToUse.length === 0}
+          &gt;
+            Start Exercise
+          &lt;/button&gt;
+        &lt;/div&gt;
+      ) : (
+        &lt;div className="game-active"&gt;
+          {gameRunning ? (
+            &lt;p&gt;Press the lit-up device!&lt;/p&gt;
+          ) : (
+            &lt;div&gt;
+              &lt;p&gt;Game Over! Final score: {score}&lt;/p&gt;
+              &lt;button onClick={startGame}&gt;Play Again&lt;/button&gt;
+            &lt;/div&gt;
+          )}
+          
+          &lt;div className="device-grid"&gt;
+            {cosmosToUse.map((device, idx) =&gt; (
+              &lt;div 
+                key={device.id}
+                className={`device-indicator ${idx === activeIndex ? 'active' : ''}`}
+                style={{
+                  backgroundColor: colorMap[idx % colorMap.length].name,
+                  opacity: idx === activeIndex ? 1 : 0.3
+                }}
+              &gt;
+                Device {idx + 1}
+              &lt;/div&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+        </div>
+
+        <!-- WebSocket API Reference -->
+        <h1 id="websocket-api-reference">🔗 WebSocket API Reference</h1>
+
+        <div class="api-box">
+            <h4>Connection</h4>
+            <p><strong>Endpoint:</strong> <code>ws://localhost:8080</code></p>
+            <pre><code>const ws = new WebSocket('ws://localhost:8080');
+
+ws.onopen = () => {
+  console.log('Connected to Cosmo Bridge');
+  ws.send(JSON.stringify({ type: 'getDevices' }));
+};</code></pre>
+        </div>
+
+        <h2>Complete API Reference</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <!-- Left Column -->
+            <div>
+                <h3 style="margin-top: 0;">📥 Outgoing Messages (Your App → Bridge)</h3>
+                
+                <div class="api-box">
+                    <h4>Device Discovery</h4>
+                    <pre><code>{ "type": "getDevices" }</code></pre>
+                    <small>Get list of all connected devices</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Device Color Control</h4>
+                    <pre><code>{
+  "type": "setColor",
+  "deviceId": "device-uuid",
+  "color": { "r": 255, "g": 0, "b": 128 }
+}</code></pre>
+                    <small>RGB values: 0-255 each</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Device Brightness</h4>
+                    <pre><code>{
+  "type": "setLuminosity",
+  "deviceId": "device-uuid",
+  "data": [64]
+}</code></pre>
+                    <small>Intensity: 0-255 (0=off, 64=bright)</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Device Mode</h4>
+                    <pre><code>{
+  "type": "setMode",
+  "deviceId": "device-uuid",
+  "data": [4]
+}</code></pre>
+                    <small>Set device operating mode</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Device Locking</h4>
+                    <pre><code>{
+  "type": "lockDevices",
+  "isLocked": true,
+  "deviceIds": ["device-1", "device-2"]
+}</code></pre>
+                    <small>Prevent other apps from using devices</small>
+                </div>
+                
+                
+                <div class="api-box">
+                    <h4>Request Device Scan</h4>
+                    <pre><code>{
+  "type": "requestScan",
+  "duration": 10000
+}</code></pre>
+                    <small>Scan for new devices (duration in ms)</small>
+                </div>
+            </div>
+            
+            <!-- Right Column -->
+            <div>
+                <h3 style="margin-top: 0;">📤 Incoming Messages (Bridge → Your App)</h3>
+                
+                <div class="api-box">
+                    <h4>Device List Response</h4>
+                    <pre><code>{
+  "type": "devices",
+  "devices": [{
+    "id": "device-uuid",
+    "name": "Cosmo Device",
+    "serial": "2405002009",
+    "firmware": "4.6.00",
+    "batteryLevel": 85,
+    "connected": true,
+    "buttonState": 0,
+    "pressValue": 0,
+    "color": [0, 0, 0],
+    "luminosity": 0
+  }]
+}</code></pre>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Button Press Event</h4>
+                    <pre><code>{
+  "type": "buttonPress",
+  "deviceId": "device-uuid",
+  "pressValue": 255
+}</code></pre>
+                    <small>Triggered when button is pressed</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Button Release Event</h4>
+                    <pre><code>{
+  "type": "buttonRelease",
+  "deviceId": "device-uuid",
+  "pressValue": 0
+}</code></pre>
+                    <small>Triggered when button is released</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Button State Change</h4>
+                    <pre><code>{
+  "type": "buttonStateChanged",
+  "deviceId": "device-uuid",
+  "buttonState": "pressed",
+  "pressValue": 255
+}</code></pre>
+                    <small>General button state updates</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Device Update</h4>
+                    <pre><code>{
+  "type": "deviceUpdate",
+  "deviceId": "device-uuid",
+  "batteryLevel": 82,
+  "connected": true
+}</code></pre>
+                    <small>Real-time device status changes</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Lock State Changed</h4>
+                    <pre><code>{
+  "type": "lockStateChanged",
+  "isLocked": true,
+  "deviceIds": ["device-1"]
+}</code></pre>
+                    <small>Device lock status update</small>
+                </div>
+                
+                <div class="api-box">
+                    <h4>Error Messages</h4>
+                    <pre><code>{
+  "type": "error",
+  "message": "Device not found",
+  "deviceId": "device-uuid"
+}</code></pre>
+                    <small>Error notifications</small>
+                </div>
+                
+            </div>
+        </div>
+        
+        <div class="api-box">
+            <h4>🎨 Color Reference</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                <span><span class="color-demo color-red"></span> Red: {r: 255, g: 0, b: 0}</span>
+                <span><span class="color-demo color-green"></span> Green: {r: 0, g: 255, b: 0}</span>
+                <span><span class="color-demo color-blue"></span> Blue: {r: 0, g: 0, b: 255}</span>
+                <span><span class="color-demo color-yellow"></span> Yellow: {r: 255, g: 255, b: 0}</span>
+                <span><span class="color-demo color-purple"></span> Purple: {r: 255, g: 0, b: 255}</span>
+                <span><span class="color-demo color-cyan"></span> Cyan: {r: 0, g: 255, b: 255}</span>
+            </div>
+        </div>
+
+        <h2>Advanced Message Types</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <div class="api-box">
+                <h4>Characteristic Value Changed</h4>
+                <pre><code>{
+  "type": "characteristicValueChanged",
+  "deviceId": "device-uuid",
+  "characteristic": "button",
+  "value": [1]
+}</code></pre>
+                <small>Raw BLE characteristic updates</small>
+            </div>
+            
+            <div class="api-box">
+                <h4>Connection State Changes</h4>
+                <pre><code>{
+  "type": "deviceConnectionChanged",
+  "deviceId": "device-uuid",
+  "connected": true,
+  "timestamp": "2025-09-03T10:30:00.000Z"
+}</code></pre>
+                <small>Device connection/disconnection events</small>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <h4>📝 Message Type Summary</h4>
+            <p><strong>All Available Message Types:</strong></p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <strong>Outgoing (Your App → Bridge):</strong>
+                    <ul style="margin: 5px 0; font-family: monospace; font-size: 13px;">
+                        <li>getDevices</li>
+                        <li>setColor</li>
+                        <li>setLuminosity</li>
+                        <li>setMode</li>
+                        <li>lockDevices</li>
+                        <li>requestScan</li>
+                    </ul>
+                </div>
+                <div>
+                    <strong>Incoming (Bridge → Your App):</strong>
+                    <ul style="margin: 5px 0; font-family: monospace; font-size: 13px;">
+                        <li>devices</li>
+                        <li>buttonPress</li>
+                        <li>buttonRelease</li>
+                        <li>buttonStateChanged</li>
+                        <li>deviceUpdate</li>
+                        <li>lockStateChanged</li>
+                        <li>error</li>
+                        <li>characteristicValueChanged</li>
+                        <li>deviceConnectionChanged</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="warning-box">
+            <h4>⚡ Performance Guidelines</h4>
+            <ul>
+                <li><strong>Rate Limiting:</strong> Maximum 10 messages/second per device</li>
+                <li><strong>Button Response:</strong> &lt;50ms from WebSocket message to UI update</li>
+                <li><strong>Multi-device:</strong> Tested with 6+ simultaneous connections</li>
+                <li><strong>Error Handling:</strong> Always validate message structure before processing</li>
+            </ul>
+        </div>
+
+        <div class="success-box">
+            <h4>🚀 Quick Start</h4>
+            <pre><code>const ws = new WebSocket('ws://localhost:8080');
+
+ws.onopen = () => {
+  console.log('Connected to Cosmo Bridge');
+  ws.send(JSON.stringify({ type: 'getDevices' }));
+};
+
+ws.onmessage = (event) => {
+  const message = JSON.parse(event.data);
+  
+  switch (message.type) {
+    case 'devices':
+      console.log('Connected devices:', message.devices);
+      break;
+    case 'buttonPress':
+      console.log(`Button pressed on device: ${message.deviceId}`);
+      break;
+  }
+};</code></pre>
+        </div>
+
         <!-- Installation & Deployment -->
         <h1 id="installation-deployment">📦 Installation & Deployment</h1>
 
@@ -775,132 +984,6 @@ export default function MyCosmosGame() {
             </ul>
         </div>
 
-        <!-- Code Samples -->
-        <h1 id="code-samples">📋 Code Samples</h1>
-
-        <div class="api-box">
-            <h4>Multi-Device Control from ExerciseGame.js</h4>
-            <pre><code>import wsService from '../services/WebSocketService';
-
-// Real device initialization and control pattern
-const initializeDevices = () => {
-  // Color mapping from the actual application
-  const colorMap = [
-    { name: 'blue', rgb: [0, 0, 4] },
-    { name: 'green', rgb: [0, 4, 0] },
-    { name: 'yellow', rgb: [4, 3, 0] },
-    { name: 'orange', rgb: [4, 1, 0] },
-    { name: 'red', rgb: [4, 0, 0] },
-    { name: 'purple', rgb: [4, 0, 4] },
-  ];
-  
-  // Initialize each device with its assigned color
-  cosmosToUse.forEach((device, idx) => {
-    console.log(`Setting up device ${device.id} (index ${idx})`);
-    const [r, g, b] = colorMap[idx % colorMap.length].rgb;
-    
-    // Set the device color and initial luminosity
-    wsService.setColor(device.id, r, g, b);
-    wsService.setLuminosity(device.id, 0); // Start dim
-  });
-};
-
-// Dynamic lighting control during gameplay
-const updateDeviceLighting = (activeIndex) => {
-  cosmosToUse.forEach((device, idx) => {
-    const shouldBeLit = idx === activeIndex;
-    const luminosity = shouldBeLit ? 64 : 0; // Bright when active, off when inactive
-    
-    console.log(`${shouldBeLit ? 'Lighting up' : 'Turning off'} device ${device.id}`);
-    wsService.setLuminosity(device.id, luminosity);
-  });
-};
-
-// Cleanup when game ends
-const cleanupDevices = () => {
-  cosmosToUse.forEach((device, idx) => {
-    const [r, g, b] = colorMap[idx % colorMap.length].rgb;
-    wsService.setColor(device.id, r, g, b);
-    wsService.setLuminosity(device.id, 0); // Turn off all lights
-  });
-};</code></pre>
-        </div>
-
-        <div class="api-box">
-            <h4>Device Selection Pattern from ExerciseSettings.js</h4>
-            <pre><code>import { useWebSocket } from '../contexts/WebSocketContext';
-
-// Real device management from ExerciseSettings component
-export default function ExerciseSettings() {
-  const { connectedDevices } = useWebSocket();
-  const numCosmos = connectedDevices.length;
-  
-  // Device indicator rendering with real connection status
-  const renderDeviceIndicators = () => {
-    return (
-      &lt;div className="flex gap-2"&gt;
-        {Array.from({ length: 6 }, (_, index) => {
-          const i = index + 1;
-          const isEnabled = index < numCosmos; // Only show enabled for connected devices
-          
-          // Real color scheme from the application
-          const colors = [
-            { bg: '#E3F2FD', border: '#2196F3', text: '#2196F3' }, // blue
-            { bg: '#E8F5E8', border: '#4CAF50', text: '#4CAF50' }, // green
-            { bg: '#FFF9E1', border: '#FFC107', text: '#FFC107' }, // yellow
-            { bg: '#FFF3E0', border: '#FF9800', text: '#FF9800' }, // orange
-            { bg: '#FFEBEE', border: '#F44336', text: '#F44336' }, // red
-            { bg: '#F3E5F5', border: '#9C27B0', text: '#9C27B0' }  // purple
-          ];
-          
-          const colorIndex = index % colors.length;
-          const { bg, border, text } = colors[colorIndex];
-          
-          return (
-            &lt;div
-              key={i}
-              className="flex items-center justify-center rounded-full"
-              style={{
-                width: '40px', height: '40px',
-                backgroundColor: isEnabled ? bg : '#F5F5F5',
-                border: `1px solid ${isEnabled ? border : '#D9D9D9'}`,
-                color: isEnabled ? text : '#9E9E9E',
-                opacity: isEnabled ? 1 : 0.5 // Disabled devices are semi-transparent
-              }}
-            &gt;
-              {i}
-            &lt;/div&gt;
-          );
-        })}
-      &lt;/div&gt;
-    );
-  };
-  
-  // Game navigation with device state
-  const handlePlay = () => {
-    navigate('/exercise', { 
-      state: { 
-        numCosmos, // Pass actual connected device count
-        duration: selectedDuration,
-        soundEnabled,
-        backgroundTrackId: selectedTrackId,
-        backgroundVolume 
-      } 
-    });
-  };
-  
-  return (
-    &lt;div&gt;
-      {/* Device indicators show connection status */}
-      {renderDeviceIndicators()}
-      
-      {/* Other settings... */}
-      &lt;button onClick={handlePlay}&gt;Play&lt;/button&gt;
-    &lt;/div&gt;
-  );
-}</code></pre>
-        </div>
-
         <!-- Troubleshooting -->
         <h1 id="troubleshooting">🔧 Troubleshooting</h1>
 
@@ -931,7 +1014,7 @@ const healthCheck = () => {
         </div>
 
         <!-- Getting Started Checklist -->
-        <h1 id="getting-started-checklist">✅ Getting Started Checklist for Developers</h1>
+        <h1 id="getting-started-checklist">✅ Distribution Checklist</h1>
 
         <div class="checklist">
             <h3>Step 1: Distribute Bridge to Your Users</h3>
@@ -1028,6 +1111,57 @@ const healthCheck = () => {
         document.querySelectorAll('h1[id]').forEach(section => {
             observer.observe(section);
         });
+
+        // Copy Code Functionality
+        function addCopyButtons() {
+            const codeBlocks = document.querySelectorAll('pre');
+            
+            codeBlocks.forEach(pre => {
+                // Skip if button already exists
+                if (pre.querySelector('.copy-btn')) return;
+                
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = 'Copy';
+                
+                copyBtn.addEventListener('click', async () => {
+                    const code = pre.querySelector('code') || pre;
+                    const text = code.textContent;
+                    
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        copyBtn.textContent = 'Copied!';
+                        copyBtn.classList.add('copied');
+                        
+                        setTimeout(() => {
+                            copyBtn.textContent = 'Copy';
+                            copyBtn.classList.remove('copied');
+                        }, 2000);
+                    } catch (err) {
+                        // Fallback for older browsers
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        
+                        copyBtn.textContent = 'Copied!';
+                        copyBtn.classList.add('copied');
+                        
+                        setTimeout(() => {
+                            copyBtn.textContent = 'Copy';
+                            copyBtn.classList.remove('copied');
+                        }, 2000);
+                    }
+                });
+                
+                pre.appendChild(copyBtn);
+            });
+        }
+        
+        // Add copy buttons when page loads
+        addCopyButtons();
     </script>
 </body>
 </html>
