@@ -318,7 +318,9 @@ function HomePage({ colors }) {
             
             {/* Download buttons */}
             <div className="flex gap-4 mb-6">
-              <button 
+              <a 
+                href="https://www.explorecosmo.com/storage/bridge/CosmoBridge-mac.dmg"
+                download
                 className="flex items-center justify-center gap-3 border" 
                 style={{
                   borderColor: '#7B1C93',
@@ -329,13 +331,16 @@ function HomePage({ colors }) {
                   fontWeight: '700',
                   borderRadius: '8px',
                   padding: '16px 24px',
-                  width: '156px'
+                  width: '156px',
+                  textDecoration: 'none'
                 }}
               >
                 <AppleLogo style={{ width: '14px', height: '16px' }} />
                 MacOS
-              </button>
-              <button 
+              </a>
+              <a 
+                href="https://www.explorecosmo.com/storage/bridge/CosmoBridge-win.exe"
+                download
                 className="flex items-center justify-center gap-3 border" 
                 style={{
                   borderColor: '#7B1C93',
@@ -346,12 +351,13 @@ function HomePage({ colors }) {
                   fontWeight: '700',
                   borderRadius: '8px',
                   padding: '16px 24px',
-                  width: '156px'
+                  width: '156px',
+                  textDecoration: 'none'
                 }}
               >
                 <WindowsLogo style={{ width: '16px', height: '16px' }} />
                 Windows
-              </button>
+              </a>
             </div>
             
             {/* How it works section */}
@@ -527,7 +533,7 @@ function HomePage({ colors }) {
                   <circle cx="6.67" cy="0" r="2" stroke="#7B1C93" strokeWidth="1.5" fill="none"/>
                 </g>
               </svg>
-              Check Documentation
+              Documentation
             </button>
           </div>
           <div className="w-1/2">
